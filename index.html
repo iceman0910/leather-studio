@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>皮革工作室管理系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5EFE6;
+    --parchment: #EDE0CC;
+    --leather: #8B5E3C;
+    --leather-dark: #5C3A1E;
+    --leather-light: #C4935A;
+    --saddle: #A0522D;
+    --ink: #2C1A0E;
+    --ink-soft: #4A3728;
+    --gold: #C9A84C;
+    --gold-light: #E2C97E;
+    --sage: #7A8C6E;
+    --rust: #B5451B;
+    --bg: #1A0F08;
+    --bg2: #231508;
+    --surface: #2E1C10;
+    --surface2: #3D2515;
+    --border: rgba(201,168,76,0.2);
+    --border-strong: rgba(201,168,76,0.5);
+    --text: #F0E6D3;
+    --text-soft: rgba(240,230,211,0.6);
+    --text-muted: rgba(240,230,211,0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(180deg, #0D0703 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border-strong);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+  }
+
+  .header-logo span {
+    font-style: italic;
+    color: var(--leather-light);
+  }
+
+  .header-subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    gap: 4px;
+    padding: 12px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    overflow-x: auto;
+    position: sticky;
+    top: 73px;
+    z-index: 99;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-soft);
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-btn:hover { color: var(--text); border-color: var(--border); }
+  .nav-btn.active {
+    background: var(--surface2);
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  /* Main */
+  .main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Section title */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-strong), transparent);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--leather-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* Form elements */
+  label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 9px 12px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  select option { background: var(--surface); }
+
+  /* Buttons */
+  .btn {
+    background: var(--leather);
+    border: none;
+    border-radius: 4px;
+    color: var(--cream);
+    padding: 9px 20px;
+    cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn:hover { background: var(--saddle); }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--leather-light));
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .btn-gold:hover { opacity: 0.9; }
+
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .btn-danger { background: var(--rust); }
+  .btn-outline {
+    background: none;
+    border: 1px solid var(--border-strong);
+    color: var(--text-soft);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold-light); background: none; }
+
+  /* Result box */
+  .result-box {
+    background: var(--bg2);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-row:last-child { border-bottom: none; }
+
+  .result-row .label { color: var(--text-soft); }
+  .result-row .value { font-weight: 500; color: var(--text); }
+  .result-row.highlight .label { color: var(--gold-light); font-weight: 500; }
+  .result-row.highlight .value { color: var(--gold-light); font-size: 16px; font-weight: 600; }
+
+  /* Stats cards */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 10px 12px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-income { background: rgba(122,140,110,0.25); color: var(--sage); border: 1px solid rgba(122,140,110,0.4); }
+  .tag-expense { background: rgba(181,69,27,0.2); color: #E87B50; border: 1px solid rgba(181,69,27,0.4); }
+  .tag-course { background: rgba(201,168,76,0.15); color: var(--gold-light); border: 1px solid var(--border-strong); }
+  .tag-market { background: rgba(139,94,60,0.25); color: var(--leather-light); border: 1px solid rgba(139,94,60,0.5); }
+  .tag-order { background: rgba(92,58,30,0.4); color: #D4A06A; border: 1px solid rgba(92,58,30,0.6); }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* Input group */
+  .input-group {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .form-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px; }
+  .form-row > * { flex: 1; }
+  .form-row .btn { flex: none; }
+
+  /* Cost breakdown */
+  .cost-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 80px 28px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .cost-row label { font-size: 11px; color: var(--text-muted); margin-bottom: 0; }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--rust);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .remove-btn:hover { opacity: 1; }
+
+  /* Pill tabs */
+  .pill-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    background: var(--bg2);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .pill-tab {
+    background: none;
+    border: none;
+    color: var(--text-soft);
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .pill-tab.active {
+    background: var(--surface2);
+    color: var(--gold-light);
+    border: 1px solid var(--border-strong);
+  }
+
+  /* Month filter */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar label { margin: 0; text-transform: uppercase; font-size: 11px; color: var(--text-muted); }
+  .filter-bar select, .filter-bar input { width: auto; min-width: 100px; }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--leather-light));
+    transition: width 0.4s ease;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Section */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Empty state */
+  .empty { text-align: center; color: var(--text-muted); padding: 32px 0; font-size: 13px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main { padding: 16px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .nav { padding: 8px 16px; }
+    .header { padding: 14px 16px; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--leather); }
+
+  .profit-positive { color: var(--sage); }
+  .profit-negative { color: #E87B50; }
+
+  .fw-500 { font-weight: 500; }
+  .mt-12 { margin-top: 12px; }
+  .mb-8 { margin-bottom: 8px; }
+  .flex { display: flex; }
+  .gap-8 { gap: 8px; }
+  .align-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+
+  .note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Photo upload */
+  .photo-upload-area {
+    border: 2px dashed var(--border-strong);
+    border-radius: 8px; padding: 24px; text-align: center;
+    cursor: pointer; transition: all 0.2s; background: var(--bg2); position: relative;
+  }
+  .photo-upload-area:hover { border-color: var(--gold); background: var(--surface); }
+  .photo-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .photo-upload-icon { font-size: 28px; margin-bottom: 6px; }
+  .photo-upload-label { font-size: 12px; color: var(--text-muted); }
+  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 10px; }
+  .photo-thumb { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-thumb .del-photo { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; line-height: 18px; text-align: center; opacity: 0; transition: opacity 0.15s; }
+  .photo-thumb:hover .del-photo { opacity: 1; }
+  #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 999; align-items: center; justify-content: center; cursor: zoom-out; }
+  #lightbox.open { display: flex; }
+  #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 6px; object-fit: contain; }
+  .stock-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+  .stock-ok { background: rgba(122,140,110,0.2); color: var(--sage); border: 1px solid rgba(122,140,110,0.4); }
+  .stock-low { background: rgba(201,168,76,0.15); color: var(--gold-light); border: 1px solid var(--border-strong); }
+  .stock-empty { background: rgba(181,69,27,0.2); color: #E87B50; border: 1px solid rgba(181,69,27,0.4); }
+  .material-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .material-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .material-card:hover { border-color: var(--border-strong); }
+  .material-card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--surface2); }
+  .material-card-img-placeholder { width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; background: var(--surface2); color: var(--text-muted); font-size: 32px; }
+  .material-card-body { padding: 12px 14px; }
+  .material-card-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .material-card-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.8; }
+  .material-card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-top: 1px solid var(--border); background: var(--bg2); }
+  .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.2s; }
+  .product-card:hover { border-color: var(--border-strong); }
+  .product-card-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--surface2); }
+  .product-card-img-placeholder { width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; background: var(--surface2); color: var(--text-muted); font-size: 32px; }
+  .product-card-body { padding: 12px 14px; }
+  .product-card-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .product-card-price { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold-light); }
+  .product-card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-top: 1px solid var(--border); background: var(--bg2); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">皮革 <span>Atelier</span> 管理系統</div>
+    <div class="header-subtitle">成本計算 · 定價輔助 · 收支追蹤 &nbsp;｜&nbsp; <span id="fb-status" style="font-size:11px;">正在連線...</span></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('dashboard')">📊 總覽</button>
+  <button class="nav-btn" onclick="showSection('cost')">🧮 成本計算 &amp; 定價</button>
+  <button class="nav-btn" onclick="showSection('products')">📦 作品管理</button>
+  <button class="nav-btn" onclick="showSection('materials')">🪡 材料進貨</button>
+  <button class="nav-btn" onclick="showSection('courses')">🎓 課程管理</button>
+  <button class="nav-btn" onclick="showSection('market')">🏪 市集管理</button>
+  <button class="nav-btn" onclick="showSection('cashflow')">💰 收支記錄</button>
+</nav>
+
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div id="section-dashboard" class="section active">
+    <div class="section-title">總覽儀表板</div>
+
+    <div class="filter-bar">
+      <label>篩選月份</label>
+      <select id="dash-month" onchange="renderDashboard()">
+        <option value="all">全部時間</option>
+      </select>
+    </div>
+
+    <div class="grid-4" id="dash-stats" style="margin-bottom:20px;"></div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">💰 收入來源分佈</div>
+        <div id="dash-income-breakdown"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 最近記錄</div>
+        <div id="dash-recent"></div>
+      </div>
+    </div>
+    <div class="card mt-12">
+      <div class="card-title">📆 月度收支概覽</div>
+      <div id="dash-monthly"></div>
+    </div>
+  </div>
+
+  <!-- COST CALCULATOR -->
+  <div id="section-cost" class="section">
+    <div class="section-title">成本計算 &amp; 定價輔助</div>
+
+    <div class="grid-2">
+      <!-- Cost Input -->
+      <div>
+        <div class="card">
+          <div class="card-title">📐 作品基本資料</div>
+          <div class="input-group">
+            <div>
+              <label>作品名稱</label>
+              <input type="text" id="calc-name" placeholder="例：手縫長夾">
+            </div>
+            <div>
+              <label>製作數量</label>
+              <input type="number" id="calc-qty" value="1" min="1">
+            </div>
+          </div>
+
+          <div class="card-title" style="margin-top:4px;">🧵 材料成本明細</div>
+          <div style="margin-bottom:8px;">
+            <div style="display:grid;grid-template-columns:1fr 100px 80px 28px;gap:8px;margin-bottom:4px;">
+              <label>項目名稱</label>
+              <label>金額 (NT$)</label>
+              <label>類別</label>
+              <label></label>
+            </div>
+            <div id="cost-items"></div>
+          </div>
+
+          <button class="btn btn-outline btn-sm" onclick="addCostItem()">＋ 新增材料項目</button>
+
+          <hr class="divider">
+
+          <div class="card-title">⏱ 工時成本</div>
+          <div class="grid-2">
+            <div>
+              <label>製作工時 (小時)</label>
+              <input type="number" id="calc-hours" value="2" step="0.5" min="0">
+            </div>
+            <div>
+              <label>時薪設定 (NT$/hr)</label>
+              <input type="number" id="calc-hourly" value="300" min="0">
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="card-title">🏪 市集攤位費分攤</div>
+          <div class="grid-2">
+            <div>
+              <label>本次攤位費 (NT$)</label>
+              <input type="number" id="calc-booth" value="0" min="0">
+            </div>
+            <div>
+              <label>預計攜帶件數</label>
+              <input type="number" id="calc-booth-qty" value="10" min="1">
+            </div>
+          </div>
+          <p class="note">攤位費將依件數平均分攤到每件作品</p>
+
+          <hr class="divider">
+
+          <div class="card-title">🎯 定價策略</div>
+          <div class="grid-2">
+            <div>
+              <label>成本倍率</label>
+              <input type="number" id="calc-multiplier" value="2.5" step="0.1" min="1">
+              <p class="note">建議範圍：2.0 ~ 4.0</p>
+            </div>
+            <div>
+              <label>目標利潤率 (%)</label>
+              <input type="number" id="calc-profit-target" value="40" min="0" max="99">
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <button class="btn btn-gold" onclick="calculate()" style="width:100%;">計算定價建議 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div>
+        <div class="card">
+          <div class="card-title">📊 計算結果</div>
+          <div id="calc-result">
+            <div class="empty">請在左側輸入資料後點擊計算</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">💾 儲存為作品</div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">計算完成後可直接儲存到作品管理</p>
+          <button class="btn" onclick="saveFromCalc()" style="width:100%;">儲存此作品定價</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div id="section-products" class="section">
+    <div class="section-title">作品管理</div>
+
+    <!-- Add photo to existing product or new quick entry -->
+    <div class="grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <div class="card-title">📷 快速新增作品照片</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">已透過計算機儲存的作品，可在卡片上直接新增照片。或在此快速建立一筆作品：</p>
+        <div class="grid-2">
+          <div><label>作品名稱</label><input type="text" id="prod-quick-name" placeholder="例：手縫長夾"></div>
+          <div><label>售價 (NT$)</label><input type="number" id="prod-quick-price" value="0"></div>
+        </div>
+        <div style="margin-top:12px;">
+          <label>狀態</label>
+          <select id="prod-quick-status">
+            <option value="販售中">販售中</option>
+            <option value="已售出">已售出</option>
+            <option value="展示品">展示品</option>
+            <option value="訂製中">訂製中</option>
+          </select>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="photo-upload-area">
+            <input type="file" accept="image/*" multiple onchange="handleProdPhotos(event)">
+            <div class="photo-upload-icon">🖼️</div>
+            <div class="photo-upload-label">點擊上傳作品照片</div>
+          </div>
+          <div class="photo-grid" id="prod-photo-preview"></div>
+        </div>
+        <button class="btn btn-gold" onclick="addQuickProduct()" style="width:100%;margin-top:16px;">新增作品</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 作品統計</div>
+        <div id="prod-stats"><div class="empty">尚無作品</div></div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <select id="prod-filter-status" onchange="renderProducts()">
+        <option value="all">全部狀態</option>
+        <option value="販售中">販售中</option>
+        <option value="已售出">已售出</option>
+        <option value="展示品">展示品</option>
+        <option value="訂製中">訂製中</option>
+      </select>
+      <input type="text" id="prod-search" placeholder="搜尋作品名稱..." oninput="renderProducts()" style="max-width:200px;">
+    </div>
+
+    <div class="material-grid" id="products-grid"></div>
+    <div id="products-empty" class="empty" style="display:none;">尚無作品，請先使用成本計算機或上方快速新增</div>
+  </div>
+
+
+  <!-- MATERIALS -->
+  <div id="section-materials" class="section">
+    <div class="section-title">材料進貨 &amp; 庫存</div>
+
+    <div class="grid-2">
+      <!-- Add form -->
+      <div class="card">
+        <div class="card-title">🪡 新增進貨記錄</div>
+        <div class="grid-2">
+          <div>
+            <label>進貨日期</label>
+            <input type="date" id="mat-date">
+          </div>
+          <div>
+            <label>類別</label>
+            <select id="mat-cat">
+              <option value="皮革">皮革</option>
+              <option value="五金">五金</option>
+              <option value="線材">線材</option>
+              <option value="工具">工具</option>
+              <option value="包裝">包裝</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <label>店家 / 供應商</label>
+          <input type="text" id="mat-shop" placeholder="例：誠品皮革、蝦皮賣家名">
+        </div>
+        <div style="margin-top:12px;">
+          <label>品名</label>
+          <input type="text" id="mat-name" placeholder="例：義大利植鞣牛皮">
+        </div>
+        <div class="grid-2" style="margin-top:12px;">
+          <div>
+            <label>尺寸 / 規格</label>
+            <input type="text" id="mat-size" placeholder="例：A4、2mm厚、30cm">
+          </div>
+          <div>
+            <label>顏色</label>
+            <input type="text" id="mat-color" placeholder="例：原色、焦茶">
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:12px;">
+          <div>
+            <label>數量</label>
+            <input type="number" id="mat-qty" value="1" min="0" step="0.1">
+          </div>
+          <div>
+            <label>單位</label>
+            <select id="mat-unit">
+              <option value="張">張</option>
+              <option value="尺">尺</option>
+              <option value="公尺">公尺</option>
+              <option value="個">個</option>
+              <option value="組">組</option>
+              <option value="克">克</option>
+              <option value="捲">捲</option>
+              <option value="包">包</option>
+              <option value="件">件</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <label>進貨金額 (NT$)</label>
+          <input type="number" id="mat-amount" value="0" min="0">
+        </div>
+        <div style="margin-top:12px;">
+          <label>庫存狀態</label>
+          <select id="mat-stock">
+            <option value="充足">充足</option>
+            <option value="偏低">偏低</option>
+            <option value="已用完">已用完</option>
+          </select>
+        </div>
+        <div style="margin-top:12px;">
+          <label>備註</label>
+          <input type="text" id="mat-note" placeholder="例：植鞣、2mm厚、適合縫合邊緣">
+        </div>
+
+        <hr class="divider">
+        <div class="card-title">📷 材料照片</div>
+        <div class="photo-upload-area" id="mat-upload-area">
+          <input type="file" accept="image/*" multiple onchange="handleMatPhotos(event)">
+          <div class="photo-upload-icon">📷</div>
+          <div class="photo-upload-label">點擊或拖曳上傳照片（可多張）</div>
+        </div>
+        <div class="photo-grid" id="mat-photo-preview"></div>
+
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold" onclick="addMaterial()" style="width:100%;">新增進貨記錄</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div>
+        <div class="card">
+          <div class="card-title">📊 庫存概覽</div>
+          <div id="mat-stats"><div class="empty">尚無記錄</div></div>
+        </div>
+        <div class="card" style="margin-top:0;">
+          <div class="card-title">⚠️ 需補貨清單</div>
+          <div id="mat-restock"><div class="empty">目前庫存充足</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Cards -->
+    <div class="filter-bar" style="margin-top:8px;">
+      <select id="mat-filter-cat" onchange="renderMaterials()">
+        <option value="all">全部類別</option>
+        <option value="皮革">皮革</option>
+        <option value="五金">五金</option>
+        <option value="線材">線材</option>
+        <option value="工具">工具</option>
+        <option value="包裝">包裝</option>
+        <option value="其他">其他</option>
+      </select>
+      <select id="mat-filter-stock" onchange="renderMaterials()">
+        <option value="all">全部狀態</option>
+        <option value="充足">充足</option>
+        <option value="偏低">偏低</option>
+        <option value="已用完">已用完</option>
+      </select>
+      <input type="text" id="mat-search" placeholder="搜尋品名或店家..." oninput="renderMaterials()" style="max-width:200px;">
+    </div>
+
+    <div class="material-grid" id="mat-grid"></div>
+    <div id="mat-empty" class="empty" style="display:none;">尚無進貨記錄</div>
+  </div>
+
+  <!-- COURSES -->
+  <div id="section-courses" class="section">
+    <div class="section-title">課程管理</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🎓 新增課程</div>
+        <div class="input-group">
+          <div>
+            <label>課程名稱</label>
+            <input type="text" id="course-name" placeholder="例：零基礎皮革入門">
+          </div>
+          <div>
+            <label>日期</label>
+            <input type="date" id="course-date">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>學員人數</label>
+            <input type="number" id="course-students" value="4" min="1">
+          </div>
+          <div>
+            <label>每人收費 (NT$)</label>
+            <input type="number" id="course-fee" value="2500">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="card-title">課程成本</div>
+        <div class="grid-2">
+          <div>
+            <label>材料費 (NT$)</label>
+            <input type="number" id="course-material" value="0">
+          </div>
+          <div>
+            <label>場地費 (NT$)</label>
+            <input type="number" id="course-venue" value="0">
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:12px;">
+          <div>
+            <label>教學工時 (小時)</label>
+            <input type="number" id="course-hours" value="3" step="0.5">
+          </div>
+          <div>
+            <label>備課工時 (小時)</label>
+            <input type="number" id="course-prep" value="1" step="0.5">
+          </div>
+        </div>
+        <div style="margin-top:4px;">
+          <label>時薪設定 (NT$/hr)</label>
+          <input type="number" id="course-hourly" value="300">
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold" onclick="addCourse()" style="width:100%;">新增課程記錄</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">課程預覽結算</div>
+          <div id="course-preview">
+            <div class="empty">填寫左側資料即時預覽</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0;">
+      <div class="card-title">課程紀錄</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>課程名稱</th>
+              <th>日期</th>
+              <th>學員</th>
+              <th>總收入</th>
+              <th>成本</th>
+              <th>淨利</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="courses-tbody"></tbody>
+        </table>
+      </div>
+      <div id="courses-empty" class="empty">尚無課程記錄</div>
+    </div>
+  </div>
+
+  <!-- MARKET -->
+  <div id="section-market" class="section">
+    <div class="section-title">市集管理</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🏪 新增市集場次</div>
+        <div class="input-group">
+          <div>
+            <label>市集名稱</label>
+            <input type="text" id="market-name" placeholder="例：三創市集">
+          </div>
+          <div>
+            <label>日期</label>
+            <input type="date" id="market-date">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>攤位費 (NT$)</label>
+            <input type="number" id="market-booth" value="1500">
+          </div>
+          <div>
+            <label>其他費用 (NT$)</label>
+            <input type="number" id="market-other" value="0" placeholder="交通、餐費...">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="card-title">市集銷售</div>
+        <div class="grid-2">
+          <div>
+            <label>銷售收入 (NT$)</label>
+            <input type="number" id="market-income" value="0">
+          </div>
+          <div>
+            <label>販售件數</label>
+            <input type="number" id="market-sold" value="0">
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold" onclick="addMarket()" style="width:100%;">儲存市集記錄</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">市集結算</div>
+          <div id="market-preview"><div class="empty">填寫左側資料即時預覽</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">市集記錄</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>市集名稱</th>
+              <th>日期</th>
+              <th>攤位費</th>
+              <th>銷售收入</th>
+              <th>件數</th>
+              <th>淨利</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="markets-tbody"></tbody>
+        </table>
+      </div>
+      <div id="markets-empty" class="empty">尚無市集記錄</div>
+    </div>
+  </div>
+
+  <!-- CASHFLOW -->
+  <div id="section-cashflow" class="section">
+    <div class="section-title">收支記錄</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">➕ 新增收支項目</div>
+        <div class="grid-2">
+          <div>
+            <label>類型</label>
+            <select id="cf-type">
+              <option value="income">收入</option>
+              <option value="expense">支出</option>
+            </select>
+          </div>
+          <div>
+            <label>類別</label>
+            <select id="cf-cat">
+              <option value="訂單">訂單銷售</option>
+              <option value="市集">市集銷售</option>
+              <option value="課程">課程收入</option>
+              <option value="皮革">皮革材料</option>
+              <option value="五金">五金配件</option>
+              <option value="線材">線材</option>
+              <option value="工具">工具設備</option>
+              <option value="包裝">包裝材料</option>
+              <option value="攤位">攤位費</option>
+              <option value="其他支出">其他支出</option>
+              <option value="其他收入">其他收入</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <label>日期</label>
+          <input type="date" id="cf-date">
+        </div>
+        <div style="margin-top:12px;">
+          <label>項目說明</label>
+          <input type="text" id="cf-desc" placeholder="例：購入牛皮 A4 x5張">
+        </div>
+        <div style="margin-top:12px;">
+          <label>金額 (NT$)</label>
+          <input type="number" id="cf-amount" value="0">
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold" onclick="addCashflow()" style="width:100%;">新增記錄</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 支出類別分佈</div>
+        <div id="cf-expense-breakdown"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex justify-between align-center" style="margin-bottom:16px;">
+        <div class="card-title" style="margin:0;">收支明細</div>
+        <div class="filter-bar" style="margin:0;gap:8px;">
+          <select id="cf-filter-month" onchange="renderCashflow()">
+            <option value="all">全部月份</option>
+          </select>
+          <select id="cf-filter-type" onchange="renderCashflow()">
+            <option value="all">全部類型</option>
+            <option value="income">收入</option>
+            <option value="expense">支出</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>說明</th>
+              <th>類別</th>
+              <th>類型</th>
+              <th>金額</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="cf-tbody"></tbody>
+        </table>
+      </div>
+      <div id="cf-empty" class="empty">尚無收支記錄</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div id="lightbox" onclick="closeLightbox()"><img id="lightbox-img" src="" alt=""></div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+// =====================================================
+//  ⚙️  請把你的 Firebase 設定貼在這裡
+//  （從 Firebase 控制台 → 專案設定 → 你的應用程式 複製）
+// =====================================================
+const firebaseConfig = {
+  apiKey:            "請填入",
+  authDomain:        "請填入",
+  projectId:         "請填入",
+  storageBucket:     "請填入",
+  messagingSenderId: "請填入",
+  appId:             "請填入"
+};
+// =====================================================
+
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
+const stor = getStorage(app);
+const auth = getAuth(app);
+
+// ===== STATE =====
+let state = {
+  products: [],
+  courses: [],
+  markets: [],
+  cashflow: [],
+  materials: [],
+  calcResult: null,
+  calcData: null,
+};
+
+// ===== FIREBASE HELPERS =====
+// 儲存單筆資料到 Firestore（照片已轉成 Storage URL）
+async function fbSave(collectionName, record) {
+  try {
+    const r = { ...record };
+    // 上傳照片並取得 URL
+    if (r.photos && r.photos.length) {
+      const urls = [];
+      for (let i = 0; i < r.photos.length; i++) {
+        const p = r.photos[i];
+        if (p.startsWith('http')) { urls.push(p); continue; } // 已是 URL
+        const storRef = ref(stor, `photos/${collectionName}/${r.id}_${i}_${Date.now()}`);
+        await uploadString(storRef, p, 'data_url');
+        const url = await getDownloadURL(storRef);
+        urls.push(url);
+      }
+      r.photos = urls;
+    }
+    await setDoc(doc(db, collectionName, String(r.id)), r);
+  } catch(e) {
+    console.error('fbSave error', e);
+    toast('⚠️ 儲存失敗，請確認 Firebase 設定');
+  }
+}
+
+async function fbDelete(collectionName, id) {
+  try {
+    await deleteDoc(doc(db, collectionName, String(id)));
+  } catch(e) { console.error('fbDelete error', e); }
+}
+
+// 監聽各 collection 的即時更新
+function listenCollection(name, stateKey, renderFn) {
+  const q = query(collection(db, name));
+  onSnapshot(q, snapshot => {
+    state[stateKey] = snapshot.docs.map(d => d.data());
+    renderFn();
+    if (stateKey === 'cashflow') populateMonthFilters();
+  }, err => {
+    console.error('listen error', name, err);
+    showFirebaseError();
+  });
+}
+
+function showFirebaseError() {
+  const el = document.getElementById('fb-status');
+  if (el) {
+    el.textContent = '⚠️ 無法連線 Firebase，請確認設定是否正確';
+    el.style.color = '#E87B50';
+  }
+}
+
+// saveState 改為同步到 Firebase
+async function saveState() {
+  // 不做任何事，各 add/delete function 直接呼叫 fbSave/fbDelete
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  // 匿名登入
+  try {
+    await signInAnonymously(auth);
+    const el = document.getElementById('fb-status');
+    if (el) { el.textContent = '✓ 已連線'; el.style.color = 'var(--sage)'; }
+  } catch(e) {
+    showFirebaseError();
+  }
+
+  // 監聽所有 collections
+  listenCollection('products',  'products',  () => { renderProducts(); });
+  listenCollection('courses',   'courses',   () => { renderCourses(); });
+  listenCollection('markets',   'markets',   () => { renderMarkets(); });
+  listenCollection('cashflow',  'cashflow',  () => { renderCashflow(); renderDashboard(); });
+  listenCollection('materials', 'materials', () => { renderMaterials(); });
+
+  const today = new Date().toISOString().split('T')[0];
+  ['course-date','market-date','cf-date','mat-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
+
+  addCostItem('', 0, '皮革');
+  addCostItem('', 0, '五金');
+  addCostItem('', 0, '線材');
+
+  ['course-name','course-date','course-students','course-fee','course-material','course-venue','course-hours','course-prep','course-hourly'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateCoursePreview);
+  });
+  ['market-name','market-date','market-booth','market-other','market-income','market-sold'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', updateMarketPreview);
+  });
+
+  populateMonthFilters();
+});
+
+// ===== NAV =====
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  const btns = document.querySelectorAll('.nav-btn');
+  const labels = ['dashboard','cost','products','materials','courses','market','cashflow'];
+  btns[labels.indexOf(name)]?.classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+}
+
+// ===== TOAST =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== COST ITEMS =====
+let costItemId = 0;
+
+function addCostItem(name = '', amount = 0, cat = '皮革') {
+  const id = ++costItemId;
+  const cats = ['皮革','五金','線材','工具','包裝','其他'];
+  const div = document.createElement('div');
+  div.className = 'cost-row';
+  div.id = 'ci-' + id;
+  div.innerHTML = `
+    <input type="text" placeholder="項目說明" value="${name}" onchange="syncCostItems()">
+    <input type="number" placeholder="0" value="${amount}" min="0" step="1" onchange="syncCostItems()">
+    <select onchange="syncCostItems()">
+      ${cats.map(c => `<option${c===cat?' selected':''}>${c}</option>`).join('')}
+    </select>
+    <button class="remove-btn" onclick="removeCostItem(${id})">×</button>
+  `;
+  document.getElementById('cost-items').appendChild(div);
+}
+
+function removeCostItem(id) {
+  document.getElementById('ci-' + id)?.remove();
+}
+
+function syncCostItems() { /* triggered on change */ }
+
+function getCostItems() {
+  const rows = document.querySelectorAll('#cost-items .cost-row');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    const sel = row.querySelector('select');
+    return {
+      name: inputs[0].value,
+      amount: parseFloat(inputs[1].value) || 0,
+      cat: sel.value,
+    };
+  });
+}
+
+// ===== CALCULATE =====
+function calculate() {
+  const name = document.getElementById('calc-name').value || '未命名作品';
+  const qty = parseInt(document.getElementById('calc-qty').value) || 1;
+  const hours = parseFloat(document.getElementById('calc-hours').value) || 0;
+  const hourly = parseFloat(document.getElementById('calc-hourly').value) || 0;
+  const boothFee = parseFloat(document.getElementById('calc-booth').value) || 0;
+  const boothQty = parseInt(document.getElementById('calc-booth-qty').value) || 1;
+  const multiplier = parseFloat(document.getElementById('calc-multiplier').value) || 2.5;
+  const profitTarget = parseFloat(document.getElementById('calc-profit-target').value) || 40;
+
+  const items = getCostItems();
+  const materialCost = items.reduce((s, i) => s + i.amount, 0);
+  const laborCost = hours * hourly;
+  const boothPerItem = boothFee / boothQty;
+  const totalCostPerItem = materialCost + laborCost + boothPerItem;
+  const totalCostBatch = totalCostPerItem * qty;
+
+  // By multiplier
+  const priceByMultiplier = Math.ceil(totalCostPerItem * multiplier / 10) * 10;
+  // By profit target
+  const priceByProfit = Math.ceil(totalCostPerItem / (1 - profitTarget / 100) / 10) * 10;
+  // Recommended = higher
+  const recommended = Math.max(priceByMultiplier, priceByProfit);
+
+  const actualProfit = recommended - totalCostPerItem;
+  const actualProfitRate = ((actualProfit / recommended) * 100).toFixed(1);
+
+  // Cat breakdown
+  const catTotals = {};
+  items.forEach(i => { catTotals[i.cat] = (catTotals[i.cat] || 0) + i.amount; });
+
+  const result = {
+    name, qty, materialCost, laborCost, boothPerItem,
+    totalCostPerItem, totalCostBatch, priceByMultiplier,
+    priceByProfit, recommended, actualProfit, actualProfitRate,
+    catTotals, items, hours, hourly, boothFee, boothQty, multiplier, profitTarget,
+  };
+  state.calcResult = result;
+  state.calcData = result;
+
+  renderCalcResult(result);
+}
+
+function renderCalcResult(r) {
+  const catColors = { '皮革':'#C4935A','五金':'#9BA8B8','線材':'#8FA68E','工具':'#B88A8A','包裝':'#A8A88A','其他':'#888' };
+
+  let catBreakdown = Object.entries(r.catTotals).map(([cat, amt]) =>
+    `<div class="result-row"><span class="label">材料・${cat}</span><span class="value">NT$ ${amt.toLocaleString()}</span></div>`
+  ).join('');
+
+  document.getElementById('calc-result').innerHTML = `
+    <div class="result-box">
+      <div style="font-size:15px;color:var(--gold-light);font-weight:500;margin-bottom:12px;">${r.name}</div>
+      ${catBreakdown}
+      <div class="result-row"><span class="label">工時成本（${r.hours}hr × NT$${r.hourly}）</span><span class="value">NT$ ${r.laborCost.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">攤位費分攤（NT$${r.boothFee}÷${r.boothQty}件）</span><span class="value">NT$ ${r.boothPerItem.toFixed(0)}</span></div>
+      <div class="result-row highlight"><span class="label">單件總成本</span><span class="value">NT$ ${r.totalCostPerItem.toLocaleString()}</span></div>
+      ${r.qty > 1 ? `<div class="result-row"><span class="label">批次成本（×${r.qty}件）</span><span class="value">NT$ ${r.totalCostBatch.toLocaleString()}</span></div>` : ''}
+    </div>
+    <div style="margin-top:12px;margin-bottom:8px;font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">定價建議</div>
+    <div class="result-box">
+      <div class="result-row"><span class="label">倍率法（×${r.multiplier}）</span><span class="value">NT$ ${r.priceByMultiplier.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">目標利潤法（${r.profitTarget}%）</span><span class="value">NT$ ${r.priceByProfit.toLocaleString()}</span></div>
+      <div class="result-row highlight"><span class="label">✦ 建議售價</span><span class="value">NT$ ${r.recommended.toLocaleString()}</span></div>
+      <div class="result-row">
+        <span class="label">預期利潤</span>
+        <span class="value ${r.actualProfit >= 0 ? 'profit-positive':'profit-negative'}">NT$ ${r.actualProfit.toFixed(0)} (${r.actualProfitRate}%)</span>
+      </div>
+      <div style="margin-top:8px;">
+        <div style="font-size:11px;color:var(--text-muted);">利潤率</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(parseFloat(r.actualProfitRate),100)}%"></div></div>
+      </div>
+    </div>
+  `;
+}
+
+async function saveFromCalc() {
+  if (!state.calcResult) { toast('請先計算定價'); return; }
+  const r = state.calcResult;
+  const prod = {
+    id: Date.now(),
+    name: r.name,
+    materialCost: r.materialCost,
+    laborCost: r.laborCost,
+    boothPerItem: r.boothPerItem,
+    totalCost: r.totalCostPerItem,
+    price: r.recommended,
+    profitRate: r.actualProfitRate,
+    date: new Date().toISOString().split('T')[0],
+    status: '販售中',
+    photos: [],
+  };
+  await fbSave('products', prod);
+  toast('✓ 已儲存至作品管理');
+}
+
+// ===== PRODUCTS =====
+function renderProducts() {
+  const filterStatus = document.getElementById('prod-filter-status')?.value || 'all';
+  const search = (document.getElementById('prod-search')?.value || '').toLowerCase();
+  const grid = document.getElementById('products-grid');
+  const empty = document.getElementById('products-empty');
+
+  let data = [...state.products].sort((a,b) => b.date.localeCompare(a.date));
+  if (filterStatus !== 'all') data = data.filter(p => (p.status||'販售中') === filterStatus);
+  if (search) data = data.filter(p => p.name.toLowerCase().includes(search));
+
+  if (!data.length) { if(grid) grid.innerHTML=''; if(empty) empty.style.display='block'; }
+  else {
+    if(empty) empty.style.display='none';
+    const statusColors = {'販售中':'stock-ok','已售出':'stock-empty','展示品':'stock-low','訂製中':'tag-course'};
+    grid.innerHTML = data.map(p => {
+      const imgHtml = p.photos && p.photos.length
+        ? `<img class="product-card-img" src="${p.photos[0]}" onclick="openLightbox('${p.photos[0]}')" style="cursor:zoom-in;" alt="">`
+        : `<div class="product-card-img-placeholder">👜</div>`;
+      const profitClass = typeof p.profitRate === 'number' && p.profitRate >= 30 ? 'profit-positive' : 'profit-negative';
+      const profitLabel = typeof p.profitRate === 'number' ? p.profitRate + '%' : p.profitRate;
+      const extraPhotos = p.photos && p.photos.length > 1
+        ? `<div class="photo-grid" style="padding:8px 14px 0;">${p.photos.slice(1).map(src => `<div class="photo-thumb" onclick="openLightbox('${src}')"><img src="${src}" alt=""></div>`).join('')}</div>`
+        : '';
+
+      // Upload extra photos
+      return `
+        <div class="product-card">
+          ${imgHtml}
+          ${extraPhotos}
+          <div class="product-card-body">
+            <div class="product-card-name">${p.name}</div>
+            <div class="product-card-price">NT$ ${p.price.toLocaleString()}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+              成本 NT$ ${p.totalCost.toLocaleString()}　
+              <span class="${profitClass}">利潤 ${profitLabel}</span>
+            </div>
+            <div style="margin-top:8px;">
+              <div class="photo-upload-area" style="padding:10px;" onclick="triggerProdPhotoUpload(${p.id})">
+                <input type="file" accept="image/*" multiple style="display:none;" id="prod-upload-${p.id}" onchange="addPhotosToProduct(${p.id}, event)">
+                <span style="font-size:11px;color:var(--text-muted);">＋ 新增照片</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-footer">
+            <select style="padding:4px 8px;font-size:11px;width:auto;" onchange="updateProductStatus(${p.id}, this.value)">
+              ${['販售中','已售出','展示品','訂製中'].map(s => `<option${(p.status||'販售中')===s?' selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">刪除</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Stats
+  const statsEl = document.getElementById('prod-stats');
+  if (statsEl && state.products.length) {
+    const byStatus = {};
+    state.products.forEach(p => { const s = p.status||'販售中'; byStatus[s]=(byStatus[s]||0)+1; });
+    statsEl.innerHTML = `<div class="result-box">` +
+      Object.entries(byStatus).map(([s,n]) => `<div class="result-row"><span class="label">${s}</span><span class="value">${n} 件</span></div>`).join('') +
+      `<div class="result-row"><span class="label">全部作品</span><span class="value">${state.products.length} 件</span></div></div>`;
+  }
+}
+
+function triggerProdPhotoUpload(id) {
+  document.getElementById('prod-upload-' + id)?.click();
+}
+
+function addPhotosToProduct(id, e) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  if (!p.photos) p.photos = [];
+  const files = Array.from(e.target.files);
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      p.photos.push(ev.target.result);
+      loaded++;
+      if (loaded === files.length) { fbSave('products', p).then(() => toast('✓ 照片已新增')); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function updateProductStatus(id, status) {
+  const p = state.products.find(x => x.id === id);
+  if (p) { p.status = status; await fbSave('products', p); }
+}
+
+async function deleteProduct(id) {
+  await fbDelete('products', id);
+}
+
+// ===== COURSES =====
+function updateCoursePreview() {
+  const students = parseInt(document.getElementById('course-students').value) || 0;
+  const fee = parseFloat(document.getElementById('course-fee').value) || 0;
+  const material = parseFloat(document.getElementById('course-material').value) || 0;
+  const venue = parseFloat(document.getElementById('course-venue').value) || 0;
+  const hours = parseFloat(document.getElementById('course-hours').value) || 0;
+  const prep = parseFloat(document.getElementById('course-prep').value) || 0;
+  const hourly = parseFloat(document.getElementById('course-hourly').value) || 0;
+
+  const income = students * fee;
+  const laborCost = (hours + prep) * hourly;
+  const totalCost = material + venue + laborCost;
+  const profit = income - totalCost;
+  const profitRate = income > 0 ? ((profit / income) * 100).toFixed(1) : 0;
+
+  document.getElementById('course-preview').innerHTML = `
+    <div class="result-box">
+      <div class="result-row"><span class="label">學員收入（${students}人×NT$${fee}）</span><span class="value profit-positive">NT$ ${income.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">材料費</span><span class="value">NT$ ${material.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">場地費</span><span class="value">NT$ ${venue.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">師資工時（${hours+prep}hr × NT$${hourly}）</span><span class="value">NT$ ${laborCost.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">總成本</span><span class="value">NT$ ${totalCost.toLocaleString()}</span></div>
+      <div class="result-row highlight"><span class="label">淨利</span><span class="value ${profit>=0?'profit-positive':'profit-negative'}">NT$ ${profit.toLocaleString()} (${profitRate}%)</span></div>
+    </div>
+  `;
+}
+
+async function addCourse() {
+  const name = document.getElementById('course-name').value;
+  if (!name) { toast('請輸入課程名稱'); return; }
+  const students = parseInt(document.getElementById('course-students').value) || 0;
+  const fee = parseFloat(document.getElementById('course-fee').value) || 0;
+  const material = parseFloat(document.getElementById('course-material').value) || 0;
+  const venue = parseFloat(document.getElementById('course-venue').value) || 0;
+  const hours = parseFloat(document.getElementById('course-hours').value) || 0;
+  const prep = parseFloat(document.getElementById('course-prep').value) || 0;
+  const hourly = parseFloat(document.getElementById('course-hourly').value) || 0;
+  const date = document.getElementById('course-date').value;
+
+  const income = students * fee;
+  const laborCost = (hours + prep) * hourly;
+  const totalCost = material + venue + laborCost;
+  const profit = income - totalCost;
+
+  const record = { id: Date.now(), name, date, students, fee, income, material, venue, laborCost, totalCost, profit };
+  state.courses.push(record);
+  await fbSave('courses', record);
+
+  // Auto-add to cashflow
+  const cf1 = { id: Date.now()+1, date, type:'income', cat:'課程', desc:`課程收入：${name}`, amount: income };
+  const cf2 = { id: Date.now()+2, date, type:'expense', cat:'其他支出', desc:`課程成本：${name}`, amount: totalCost };
+  await fbSave('cashflow', cf1);
+  if (totalCost > 0) await fbSave('cashflow', cf2);
+
+  toast('✓ 課程記錄已新增');
+}
+
+function renderCourses() {
+  const tbody = document.getElementById('courses-tbody');
+  const empty = document.getElementById('courses-empty');
+  tbody.innerHTML = '';
+  if (!state.courses.length) { empty.style.display='block'; return; }
+  empty.style.display='none';
+  state.courses.forEach(c => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.date}</td>
+        <td>${c.students} 人</td>
+        <td class="profit-positive">NT$ ${c.income.toLocaleString()}</td>
+        <td>NT$ ${c.totalCost.toLocaleString()}</td>
+        <td class="${c.profit>=0?'profit-positive':'profit-negative'}">NT$ ${c.profit.toLocaleString()}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">刪除</button></td>
+      </tr>`;
+  });
+}
+
+async function deleteCourse(id) {
+  await fbDelete('courses', id);
+}
+
+// ===== MARKET =====
+function updateMarketPreview() {
+  const booth = parseFloat(document.getElementById('market-booth').value) || 0;
+  const other = parseFloat(document.getElementById('market-other').value) || 0;
+  const income = parseFloat(document.getElementById('market-income').value) || 0;
+  const sold = parseInt(document.getElementById('market-sold').value) || 0;
+
+  const totalCost = booth + other;
+  const profit = income - totalCost;
+  const avgPerItem = sold > 0 ? (income / sold).toFixed(0) : 0;
+  const profitRate = income > 0 ? ((profit / income)*100).toFixed(1) : 0;
+
+  document.getElementById('market-preview').innerHTML = `
+    <div class="result-box">
+      <div class="result-row"><span class="label">銷售收入</span><span class="value profit-positive">NT$ ${income.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">販售件數</span><span class="value">${sold} 件</span></div>
+      <div class="result-row"><span class="label">每件平均售價</span><span class="value">NT$ ${avgPerItem}</span></div>
+      <div class="result-row"><span class="label">攤位費</span><span class="value">NT$ ${booth.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">其他費用</span><span class="value">NT$ ${other.toLocaleString()}</span></div>
+      <div class="result-row highlight"><span class="label">淨利</span><span class="value ${profit>=0?'profit-positive':'profit-negative'}">NT$ ${profit.toLocaleString()} (${profitRate}%)</span></div>
+    </div>
+  `;
+}
+
+async function addMarket() {
+  const name = document.getElementById('market-name').value;
+  if (!name) { toast('請輸入市集名稱'); return; }
+  const date = document.getElementById('market-date').value;
+  const booth = parseFloat(document.getElementById('market-booth').value) || 0;
+  const other = parseFloat(document.getElementById('market-other').value) || 0;
+  const income = parseFloat(document.getElementById('market-income').value) || 0;
+  const sold = parseInt(document.getElementById('market-sold').value) || 0;
+
+  const totalCost = booth + other;
+  const profit = income - totalCost;
+
+  const record = { id: Date.now(), name, date, booth, other, totalCost, income, sold, profit };
+  state.markets.push(record);
+  await fbSave('markets', record);
+
+  const cf1 = { id: Date.now()+1, date, type:'income', cat:'市集', desc:`市集銷售：${name}`, amount: income };
+  await fbSave('cashflow', cf1);
+  if (totalCost > 0) {
+    const cf2 = { id: Date.now()+2, date, type:'expense', cat:'攤位', desc:`市集費用：${name}`, amount: totalCost };
+    await fbSave('cashflow', cf2);
+  }
+
+  toast('✓ 市集記錄已新增');
+}
+
+function renderMarkets() {
+  const tbody = document.getElementById('markets-tbody');
+  const empty = document.getElementById('markets-empty');
+  tbody.innerHTML = '';
+  if (!state.markets.length) { empty.style.display='block'; return; }
+  empty.style.display='none';
+  state.markets.forEach(m => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.date}</td>
+        <td>NT$ ${m.booth.toLocaleString()}</td>
+        <td class="profit-positive">NT$ ${m.income.toLocaleString()}</td>
+        <td>${m.sold} 件</td>
+        <td class="${m.profit>=0?'profit-positive':'profit-negative'}">NT$ ${m.profit.toLocaleString()}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteMarket(${m.id})">刪除</button></td>
+      </tr>`;
+  });
+}
+
+async function deleteMarket(id) {
+  await fbDelete('markets', id);
+}
+
+// ===== CASHFLOW =====
+async function addCashflow() {
+  const type = document.getElementById('cf-type').value;
+  const cat = document.getElementById('cf-cat').value;
+  const date = document.getElementById('cf-date').value;
+  const desc = document.getElementById('cf-desc').value;
+  const amount = parseFloat(document.getElementById('cf-amount').value) || 0;
+  if (!desc) { toast('請輸入項目說明'); return; }
+  if (!amount) { toast('請輸入金額'); return; }
+
+  const cfRecord = { id: Date.now(), date, type, cat, desc, amount };
+  await fbSave('cashflow', cfRecord);
+  document.getElementById('cf-desc').value = '';
+  document.getElementById('cf-amount').value = '0';
+  toast('✓ 收支記錄已新增');
+}
+
+function renderCashflow() {
+  const filterMonth = document.getElementById('cf-filter-month')?.value || 'all';
+  const filterType = document.getElementById('cf-filter-type')?.value || 'all';
+
+  let data = [...state.cashflow].sort((a,b) => b.date.localeCompare(a.date));
+  if (filterMonth !== 'all') data = data.filter(c => c.date.startsWith(filterMonth));
+  if (filterType !== 'all') data = data.filter(c => c.type === filterType);
+
+  const tbody = document.getElementById('cf-tbody');
+  const empty = document.getElementById('cf-empty');
+  tbody.innerHTML = '';
+  if (!data.length) { empty.style.display='block'; tbody.style.display='none'; return; }
+  empty.style.display='none'; tbody.style.display='';
+
+  data.forEach(c => {
+    const sign = c.type === 'income' ? '+' : '-';
+    const cls = c.type === 'income' ? 'profit-positive' : 'profit-negative';
+    const tag = c.type === 'income' ? 'tag-income' : 'tag-expense';
+    tbody.innerHTML += `
+      <tr>
+        <td>${c.date}</td>
+        <td>${c.desc}</td>
+        <td><span class="tag tag-${c.cat==='市集'?'market':c.cat==='課程'?'course':'expense'}">${c.cat}</span></td>
+        <td><span class="tag ${tag}">${c.type==='income'?'收入':'支出'}</span></td>
+        <td class="${cls}">${sign} NT$ ${c.amount.toLocaleString()}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteCashflow(${c.id})">刪除</button></td>
+      </tr>`;
+  });
+
+  // Expense breakdown
+  const expenses = state.cashflow.filter(c => c.type === 'expense');
+  const catTotals = {};
+  expenses.forEach(c => { catTotals[c.cat] = (catTotals[c.cat] || 0) + c.amount; });
+  const totalExp = Object.values(catTotals).reduce((s,v) => s+v, 0);
+
+  let breakdown = '';
+  if (totalExp > 0) {
+    Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).forEach(([cat, amt]) => {
+      const pct = ((amt/totalExp)*100).toFixed(0);
+      breakdown += `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;">
+            <span>${cat}</span>
+            <span>NT$ ${amt.toLocaleString()} (${pct}%)</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    });
+  } else {
+    breakdown = '<div class="empty">尚無支出記錄</div>';
+  }
+  document.getElementById('cf-expense-breakdown').innerHTML = breakdown;
+}
+
+async function deleteCashflow(id) {
+  await fbDelete('cashflow', id);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const filterMonth = document.getElementById('dash-month')?.value || 'all';
+  let data = filterMonth === 'all' ? state.cashflow : state.cashflow.filter(c => c.date.startsWith(filterMonth));
+
+  const income = data.filter(c=>c.type==='income').reduce((s,c)=>s+c.amount, 0);
+  const expense = data.filter(c=>c.type==='expense').reduce((s,c)=>s+c.amount, 0);
+  const profit = income - expense;
+  const profitRate = income > 0 ? ((profit/income)*100).toFixed(1) : 0;
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">總收入</div>
+      <div class="stat-value">$${Math.round(income/1000)}k</div>
+      <div class="stat-sub">NT$ ${income.toLocaleString()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">總支出</div>
+      <div class="stat-value" style="color:#E87B50;">$${Math.round(expense/1000)}k</div>
+      <div class="stat-sub">NT$ ${expense.toLocaleString()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">淨利</div>
+      <div class="stat-value" style="color:${profit>=0?'var(--sage)':'#E87B50'};">$${Math.round(profit/1000)}k</div>
+      <div class="stat-sub">NT$ ${profit.toLocaleString()}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">利潤率</div>
+      <div class="stat-value" style="color:${profitRate>=30?'var(--sage)':'#E87B50'};">${profitRate}%</div>
+      <div class="stat-sub">目標 30%+</div>
+    </div>
+  `;
+
+  // Income breakdown
+  const incomeData = data.filter(c=>c.type==='income');
+  const incCats = {};
+  incomeData.forEach(c => { incCats[c.cat] = (incCats[c.cat] || 0) + c.amount; });
+  const totalInc = income;
+  let incBreakdown = '';
+  if (totalInc > 0) {
+    Object.entries(incCats).sort((a,b)=>b[1]-a[1]).forEach(([cat, amt]) => {
+      const pct = ((amt/totalInc)*100).toFixed(0);
+      incBreakdown += `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+            <span>${cat}</span><span>NT$ ${amt.toLocaleString()} (${pct}%)</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    });
+  } else {
+    incBreakdown = '<div class="empty">尚無收入記錄</div>';
+  }
+  document.getElementById('dash-income-breakdown').innerHTML = incBreakdown;
+
+  // Recent
+  const recent = [...state.cashflow].sort((a,b)=>b.date.localeCompare(a.date)).slice(0, 6);
+  let recentHtml = '';
+  if (recent.length) {
+    recent.forEach(c => {
+      const cls = c.type==='income'?'profit-positive':'profit-negative';
+      const sign = c.type==='income'?'+':'-';
+      recentHtml += `
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="color:var(--text-soft);">${c.date} · ${c.desc.slice(0,12)}${c.desc.length>12?'...':''}</span>
+          <span class="${cls}">${sign} NT$ ${c.amount.toLocaleString()}</span>
+        </div>`;
+    });
+  } else {
+    recentHtml = '<div class="empty">尚無記錄</div>';
+  }
+  document.getElementById('dash-recent').innerHTML = recentHtml;
+
+  // Monthly breakdown
+  const monthMap = {};
+  state.cashflow.forEach(c => {
+    const m = c.date.slice(0,7);
+    if (!monthMap[m]) monthMap[m] = { income: 0, expense: 0 };
+    if (c.type === 'income') monthMap[m].income += c.amount;
+    else monthMap[m].expense += c.amount;
+  });
+  const months = Object.keys(monthMap).sort();
+  if (months.length) {
+    const maxVal = Math.max(...months.map(m => Math.max(monthMap[m].income, monthMap[m].expense)), 1);
+    let monthly = `<div style="display:flex;gap:8px;align-items:flex-end;height:100px;overflow-x:auto;padding-bottom:8px;">`;
+    months.forEach(m => {
+      const inc = monthMap[m].income;
+      const exp = monthMap[m].expense;
+      const incH = Math.round((inc/maxVal)*80);
+      const expH = Math.round((exp/maxVal)*80);
+      monthly += `
+        <div style="flex:1;min-width:48px;text-align:center;">
+          <div style="display:flex;gap:2px;align-items:flex-end;justify-content:center;margin-bottom:4px;">
+            <div style="width:12px;height:${incH}px;background:var(--sage);border-radius:2px 2px 0 0;" title="收入 NT$ ${inc.toLocaleString()}"></div>
+            <div style="width:12px;height:${expH}px;background:#E87B50;border-radius:2px 2px 0 0;" title="支出 NT$ ${exp.toLocaleString()}"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);">${m.slice(5)}</div>
+        </div>`;
+    });
+    monthly += `</div>
+      <div style="display:flex;gap:16px;margin-top:4px;font-size:11px;color:var(--text-muted);">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--sage);border-radius:1px;margin-right:4px;"></span>收入</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#E87B50;border-radius:1px;margin-right:4px;"></span>支出</span>
+      </div>`;
+    document.getElementById('dash-monthly').innerHTML = monthly;
+  } else {
+    document.getElementById('dash-monthly').innerHTML = '<div class="empty">尚無資料</div>';
+  }
+}
+
+// ===== MONTH FILTERS =====
+function populateMonthFilters() {
+  const months = [...new Set(state.cashflow.map(c => c.date.slice(0,7)))].sort().reverse();
+
+  ['dash-month','cf-filter-month'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const current = el.value;
+    el.innerHTML = `<option value="all">全部</option>` +
+      months.map(m => `<option value="${m}"${m===current?' selected':''}>${m}</option>`).join('');
+  });
+}
+
+
+// ===== PHOTO HELPERS =====
+let pendingMatPhotos = []; // base64 strings
+let pendingProdPhotos = [];
+
+function handleMatPhotos(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      pendingMatPhotos.push(ev.target.result);
+      renderPendingPhotos('mat-photo-preview', pendingMatPhotos, 'mat');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleProdPhotos(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      pendingProdPhotos.push(ev.target.result);
+      renderPendingPhotos('prod-photo-preview', pendingProdPhotos, 'prod');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPendingPhotos(containerId, photos, prefix) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = photos.map((src, i) => `
+    <div class="photo-thumb" onclick="openLightbox('${src}')">
+      <img src="${src}" alt="">
+      <button class="del-photo" onclick="event.stopPropagation();removePendingPhoto('${prefix}',${i})">×</button>
+    </div>`).join('');
+}
+
+function removePendingPhoto(prefix, idx) {
+  if (prefix === 'mat') { pendingMatPhotos.splice(idx, 1); renderPendingPhotos('mat-photo-preview', pendingMatPhotos, 'mat'); }
+  else { pendingProdPhotos.splice(idx, 1); renderPendingPhotos('prod-photo-preview', pendingProdPhotos, 'prod'); }
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// ===== MATERIALS =====
+async function addMaterial() {
+  const name = document.getElementById('mat-name').value;
+  if (!name) { toast('請輸入品名'); return; }
+  const amount = parseFloat(document.getElementById('mat-amount').value) || 0;
+  const date = document.getElementById('mat-date').value;
+  const record = {
+    id: Date.now(),
+    date,
+    cat: document.getElementById('mat-cat').value,
+    shop: document.getElementById('mat-shop').value,
+    name,
+    size: document.getElementById('mat-size').value,
+    color: document.getElementById('mat-color').value,
+    qty: parseFloat(document.getElementById('mat-qty').value) || 1,
+    unit: document.getElementById('mat-unit').value,
+    amount,
+    stock: document.getElementById('mat-stock').value,
+    note: document.getElementById('mat-note').value,
+    photos: [...pendingMatPhotos],
+  };
+  await fbSave('materials', record);
+
+  if (amount > 0) {
+    const cf = { id: Date.now()+1, date, type:'expense', cat: record.cat, desc:`進貨：${name}（${record.shop || '未知店家'}）`, amount };
+    await fbSave('cashflow', cf);
+  }
+
+  pendingMatPhotos = [];
+  document.getElementById('mat-photo-preview').innerHTML = '';
+  document.getElementById('mat-name').value = '';
+  document.getElementById('mat-shop').value = '';
+  document.getElementById('mat-size').value = '';
+  document.getElementById('mat-color').value = '';
+  document.getElementById('mat-note').value = '';
+  document.getElementById('mat-amount').value = '0';
+  document.getElementById('mat-qty').value = '1';
+
+  toast('✓ 進貨記錄已新增');
+}
+
+function renderMaterials() {
+  const filterCat = document.getElementById('mat-filter-cat')?.value || 'all';
+  const filterStock = document.getElementById('mat-filter-stock')?.value || 'all';
+  const search = (document.getElementById('mat-search')?.value || '').toLowerCase();
+
+  let data = [...state.materials].sort((a,b) => b.date.localeCompare(a.date));
+  if (filterCat !== 'all') data = data.filter(m => m.cat === filterCat);
+  if (filterStock !== 'all') data = data.filter(m => m.stock === filterStock);
+  if (search) data = data.filter(m => m.name.toLowerCase().includes(search) || (m.shop||'').toLowerCase().includes(search));
+
+  const grid = document.getElementById('mat-grid');
+  const empty = document.getElementById('mat-empty');
+
+  if (!data.length) { grid.innerHTML = ''; empty.style.display = 'block'; }
+  else {
+    empty.style.display = 'none';
+    const catIcons = { '皮革':'🟤','五金':'⚙️','線材':'🧵','工具':'🔨','包裝':'📦','其他':'📎' };
+    grid.innerHTML = data.map(m => {
+      const stockClass = m.stock === '充足' ? 'stock-ok' : m.stock === '偏低' ? 'stock-low' : 'stock-empty';
+      const imgHtml = m.photos && m.photos.length
+        ? `<img class="material-card-img" src="${m.photos[0]}" onclick="openLightbox('${m.photos[0]}')" style="cursor:zoom-in;" alt="">`
+        : `<div class="material-card-img-placeholder">${catIcons[m.cat]||'📎'}</div>`;
+      const extraPhotos = m.photos && m.photos.length > 1
+        ? `<div class="photo-grid" style="padding:8px 14px 0;">${m.photos.slice(1).map(src => `<div class="photo-thumb" onclick="openLightbox('${src}')"><img src="${src}" alt=""></div>`).join('')}</div>`
+        : '';
+      return `
+        <div class="material-card">
+          ${imgHtml}
+          ${extraPhotos}
+          <div class="material-card-body">
+            <div class="material-card-name">${m.name}</div>
+            <div class="material-card-meta">
+              🏪 ${m.shop || '—'}<br>
+              📅 ${m.date}<br>
+              📐 ${m.size || '—'}　${m.color ? '🎨 ' + m.color : ''}<br>
+              📦 ${m.qty} ${m.unit}　💰 NT$ ${m.amount.toLocaleString()}
+              ${m.note ? '<br>📝 ' + m.note : ''}
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="tag tag-${m.cat==='皮革'?'order':m.cat==='五金'?'market':'expense'}">${m.cat}</span>
+              <span class="stock-badge ${stockClass}">${m.stock}</span>
+            </div>
+          </div>
+          <div class="material-card-footer">
+            <div style="display:flex;gap:6px;">
+              <select style="padding:4px 8px;font-size:11px;width:auto;" onchange="updateMatStock(${m.id}, this.value)">
+                <option${m.stock==='充足'?' selected':''}>充足</option>
+                <option${m.stock==='偏低'?' selected':''}>偏低</option>
+                <option${m.stock==='已用完'?' selected':''}>已用完</option>
+              </select>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">刪除</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Stats
+  const total = state.materials.reduce((s,m) => s + m.amount, 0);
+  const byStock = { '充足': 0, '偏低': 0, '已用完': 0 };
+  state.materials.forEach(m => byStock[m.stock]++);
+  const statsEl = document.getElementById('mat-stats');
+  if (statsEl) {
+    statsEl.innerHTML = state.materials.length ? `
+      <div class="result-box">
+        <div class="result-row"><span class="label">總進貨筆數</span><span class="value">${state.materials.length} 筆</span></div>
+        <div class="result-row"><span class="label">總進貨金額</span><span class="value">NT$ ${total.toLocaleString()}</span></div>
+        <div class="result-row"><span class="label">庫存充足</span><span class="value profit-positive">${byStock['充足']} 項</span></div>
+        <div class="result-row"><span class="label">庫存偏低</span><span class="value" style="color:var(--gold-light)">${byStock['偏低']} 項</span></div>
+        <div class="result-row"><span class="label">已用完</span><span class="value profit-negative">${byStock['已用完']} 項</span></div>
+      </div>` : '<div class="empty">尚無記錄</div>';
+  }
+
+  // Restock list
+  const restockEl = document.getElementById('mat-restock');
+  if (restockEl) {
+    const needRestock = state.materials.filter(m => m.stock !== '充足');
+    restockEl.innerHTML = needRestock.length
+      ? needRestock.map(m => `
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
+            <span>${m.name} <span style="color:var(--text-muted);">（${m.shop||'—'}）</span></span>
+            <span class="stock-badge ${m.stock==='偏低'?'stock-low':'stock-empty'}">${m.stock}</span>
+          </div>`).join('')
+      : '<div class="empty" style="padding:12px 0;">目前庫存充足 ✓</div>';
+  }
+}
+
+async function updateMatStock(id, stock) {
+  const m = state.materials.find(m => m.id === id);
+  if (m) { m.stock = stock; await fbSave('materials', m); }
+}
+
+async function deleteMaterial(id) {
+  await fbDelete('materials', id);
+}
+
+// ===== QUICK PRODUCT ADD =====
+async function addQuickProduct() {
+  const name = document.getElementById('prod-quick-name').value;
+  if (!name) { toast('請輸入作品名稱'); return; }
+  const price = parseFloat(document.getElementById('prod-quick-price').value) || 0;
+  const status = document.getElementById('prod-quick-status').value;
+  const qp = {
+    id: Date.now(),
+    name,
+    materialCost: 0,
+    laborCost: 0,
+    boothPerItem: 0,
+    totalCost: 0,
+    price,
+    profitRate: '—',
+    date: new Date().toISOString().split('T')[0],
+    status,
+    photos: [...pendingProdPhotos],
+  };
+  await fbSave('products', qp);
+  pendingProdPhotos = [];
+  document.getElementById('prod-photo-preview').innerHTML = '';
+  document.getElementById('prod-quick-name').value = '';
+  document.getElementById('prod-quick-price').value = '0';
+  toast('✓ 作品已新增');
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderDashboard();
+  renderProducts();
+  renderMaterials();
+  renderCourses();
+  renderMarkets();
+  renderCashflow();
+  populateMonthFilters();
+}
+
+// expose functions to global scope (needed for inline onclick with module script)
+window.showSection = showSection;
+window.calculate = calculate;
+window.saveFromCalc = saveFromCalc;
+window.addCostItem = addCostItem;
+window.removeCostItem = removeCostItem;
+window.addCourse = addCourse;
+window.deleteCourse = deleteCourse;
+window.addMarket = addMarket;
+window.deleteMarket = deleteMarket;
+window.addCashflow = addCashflow;
+window.deleteCashflow = deleteCashflow;
+window.addMaterial = addMaterial;
+window.deleteMaterial = deleteMaterial;
+window.updateMatStock = updateMatStock;
+window.addQuickProduct = addQuickProduct;
+window.deleteProduct = deleteProduct;
+window.updateProductStatus = updateProductStatus;
+window.triggerProdPhotoUpload = triggerProdPhotoUpload;
+window.addPhotosToProduct = addPhotosToProduct;
+window.handleMatPhotos = handleMatPhotos;
+window.handleProdPhotos = handleProdPhotos;
+window.removePendingPhoto = removePendingPhoto;
+window.openLightbox = openLightbox;
+window.closeLightbox = closeLightbox;
+window.renderCashflow = renderCashflow;
+window.renderDashboard = renderDashboard;
+window.renderMaterials = renderMaterials;
+window.renderProducts = renderProducts;
+
+// Live preview for course & market
+document.addEventListener('input', e => {
+  const courseIds = ['course-name','course-date','course-students','course-fee','course-material','course-venue','course-hours','course-prep','course-hourly'];
+  const marketIds = ['market-booth','market-other','market-income','market-sold'];
+  if (courseIds.includes(e.target.id)) updateCoursePreview();
+  if (marketIds.includes(e.target.id)) updateMarketPreview();
+});
+
+updateCoursePreview();
+updateMarketPreview();
+</script>
+<!-- end module -->
+</body>
+</html>
