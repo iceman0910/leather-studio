@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>皮革工作室管理系統</title>
-<script type="text/javascript" nonce="41afda1e0e7044b0b182f73f312" src="//local.adguard.org?ts=1775026447149&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F0%2F%3Fui%3D2%26ik%3D2b14a674cc%26attid%3D0.1%26permmsgid%3Dmsg-f%3A1861252184699268130%26th%3D19d47f002a6b6c22%26view%3Datt%26disp%3Dsafe%26realattid%3D19d47efc79162c78da01%26zw%26saddbat%3DANGjdJ8Z9Lg9yGhn99AubyCUKeu8NirD4Qzjwl9-fkAKblRJ61Vdq0QAJHoRgjjKql_YVhYzJhZP7kVFC1iCfoB8fvMbaawNFxkVc5L6-dz28azJ_VBk-gwwxS2kf6rp3fpDyySuWurd6L-4ExE2hxzdWJRYq2sHL57ktEgAQSR9GxjYxOth5sO2JT0O8b92ehLQzsGZy5hJ6h60W9uEoqrWvIkDp5UMDcP7V_Zd2kTqGWaBylEvnIgAHIrj53gfVxlfXYnee4GzEs8ZrOm7P9JwZGS4HHOOnPBVEFq1bTJkegx3jpTHHbgBfzRhDxsZ-c0biTAaCxfQ4y7-hF4UZ5nyCT-r3mfMYA5jpEdSHPvbkIbLSco_Hcb5fib2Cs1vx8WjJlYtOH0bCc8mmc0RYOa9qlZMwIbsyMOFaBZrtFet2TgMo4Q_uvikpb2BP3B44jPTr6L1aQWXBUF_BxqrXD_UIO-LJQkcPpSAUYvLjgI3J1msIWvDal4F7QUcYTed3SMAA9-vkj4cSWlLlirVX_IhCHf0qSseNM08pQrc3RCMXVZR7gQ0JX0r35z5dBuaqtLNsse18VmI4me-8gSobwfCD1e5mRKIUzL3Om_lnRMNMBMeVOgSDFI_M5H65Pm0tvGX9KV5PDB9IYVr5YI57VuRwvaTWn6XkNNi8GzdulnIZdsjBLGczI8bR4H1T3H0CSrCeE-eQBzAtheJF92cHo4DXs59gEc9dEARlNom-2tfOOsQfawM-17LYI3jUzOzwuexpTmDnYHxUyjZrXd5fvjOa2EksMUrNyBhr4sNREaHfbYyJ3eauIDGtjvCU8Dz2pPYvsGVWM6rQKyzFME-yLu1hY4XGwBUeI1Dj0xLtpEMn8EVv_4u5ybum3EoR04wvFgB_6_9fssA4aPSrd51pdLCWRrwEz3U_RY5Lp_46mVG9SVlwTnKpbEkahxbdwutyiLpMqOndj9XXkU_dAdKmTjD4j5Jwwo1DBJd01siJvSBwqMUkMr3mGVl9ukN_JYV-Nkia5xCY7E1atiMA72s&amp;app=com.apple.Safari&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #F5EFE6;
@@ -1740,19 +1740,19 @@ function updateMarketPreview() {
   const avgPerItem = sold > 0 ? (income / sold).toFixed(0) : 0;
   const profitRate = income > 0 ? ((profit / income)*100).toFixed(1) : 0;
 
-  document.getElementById('market-preview').innerHTML = \`
+  document.getElementById('market-preview').innerHTML = `
     <div class="result-box">
-      <div class="result-row"><span class="label">活動天數</span><span class="value">\${days} 天</span></div>
-      <div class="result-row"><span class="label">銷售收入</span><span class="value profit-positive">NT$ \${income.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">販售件數</span><span class="value">\${sold} 件</span></div>
-      <div class="result-row"><span class="label">每件平均售價</span><span class="value">NT$ \${avgPerItem}</span></div>
-      <div class="result-row"><span class="label">攤位費</span><span class="value">NT$ \${booth.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">押金（可退）</span><span class="value" style="color:var(--text-muted)">NT$ \${deposit.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">硬體租借</span><span class="value">NT$ \${hardware.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">其他費用</span><span class="value">NT$ \${other.toLocaleString()}</span></div>
-      <div class="result-row highlight"><span class="label">淨利</span><span class="value \${profit>=0?'profit-positive':'profit-negative'}">NT$ \${profit.toLocaleString()} (\${profitRate}%)</span></div>
+      <div class="result-row"><span class="label">活動天數</span><span class="value">${days} 天</span></div>
+      <div class="result-row"><span class="label">銷售收入</span><span class="value profit-positive">NT$ ${income.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">販售件數</span><span class="value">${sold} 件</span></div>
+      <div class="result-row"><span class="label">每件平均售價</span><span class="value">NT$ ${avgPerItem}</span></div>
+      <div class="result-row"><span class="label">攤位費</span><span class="value">NT$ ${booth.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">押金（可退）</span><span class="value" style="color:var(--text-muted)">NT$ ${deposit.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">硬體租借</span><span class="value">NT$ ${hardware.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">其他費用</span><span class="value">NT$ ${other.toLocaleString()}</span></div>
+      <div class="result-row highlight"><span class="label">淨利</span><span class="value ${profit>=0?'profit-positive':'profit-negative'}">NT$ ${profit.toLocaleString()} (${profitRate}%)</span></div>
     </div>
-  \`;
+  `;
 }
 
 async function addMarket() {
