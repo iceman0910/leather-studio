@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>皮革工作室管理系統</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="text/javascript" nonce="41afda1e0e7044b0b182f73f312" src="//local.adguard.org?ts=1775026447149&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F0%2F%3Fui%3D2%26ik%3D2b14a674cc%26attid%3D0.1%26permmsgid%3Dmsg-f%3A1861252184699268130%26th%3D19d47f002a6b6c22%26view%3Datt%26disp%3Dsafe%26realattid%3D19d47efc79162c78da01%26zw%26saddbat%3DANGjdJ8Z9Lg9yGhn99AubyCUKeu8NirD4Qzjwl9-fkAKblRJ61Vdq0QAJHoRgjjKql_YVhYzJhZP7kVFC1iCfoB8fvMbaawNFxkVc5L6-dz28azJ_VBk-gwwxS2kf6rp3fpDyySuWurd6L-4ExE2hxzdWJRYq2sHL57ktEgAQSR9GxjYxOth5sO2JT0O8b92ehLQzsGZy5hJ6h60W9uEoqrWvIkDp5UMDcP7V_Zd2kTqGWaBylEvnIgAHIrj53gfVxlfXYnee4GzEs8ZrOm7P9JwZGS4HHOOnPBVEFq1bTJkegx3jpTHHbgBfzRhDxsZ-c0biTAaCxfQ4y7-hF4UZ5nyCT-r3mfMYA5jpEdSHPvbkIbLSco_Hcb5fib2Cs1vx8WjJlYtOH0bCc8mmc0RYOa9qlZMwIbsyMOFaBZrtFet2TgMo4Q_uvikpb2BP3B44jPTr6L1aQWXBUF_BxqrXD_UIO-LJQkcPpSAUYvLjgI3J1msIWvDal4F7QUcYTed3SMAA9-vkj4cSWlLlirVX_IhCHf0qSseNM08pQrc3RCMXVZR7gQ0JX0r35z5dBuaqtLNsse18VmI4me-8gSobwfCD1e5mRKIUzL3Om_lnRMNMBMeVOgSDFI_M5H65Pm0tvGX9KV5PDB9IYVr5YI57VuRwvaTWn6XkNNi8GzdulnIZdsjBLGczI8bR4H1T3H0CSrCeE-eQBzAtheJF92cHo4DXs59gEc9dEARlNom-2tfOOsQfawM-17LYI3jUzOzwuexpTmDnYHxUyjZrXd5fvjOa2EksMUrNyBhr4sNREaHfbYyJ3eauIDGtjvCU8Dz2pPYvsGVWM6rQKyzFME-yLu1hY4XGwBUeI1Dj0xLtpEMn8EVv_4u5ybum3EoR04wvFgB_6_9fssA4aPSrd51pdLCWRrwEz3U_RY5Lp_46mVG9SVlwTnKpbEkahxbdwutyiLpMqOndj9XXkU_dAdKmTjD4j5Jwwo1DBJd01siJvSBwqMUkMr3mGVl9ukN_JYV-Nkia5xCY7E1atiMA72s&amp;app=com.apple.Safari&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #F5EFE6;
@@ -526,6 +526,29 @@
   .product-card-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
   .product-card-price { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold-light); }
   .product-card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-top: 1px solid var(--border); background: var(--bg2); font-size: 12px; }
+
+  /* ── Edit Modal ── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+    z-index:500; align-items:center; justify-content:center; padding:16px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background:var(--surface); border:1px solid var(--border-strong);
+    border-radius:10px; padding:24px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; position:relative;
+  }
+  .modal-title {
+    font-family:'Cormorant Garamond',serif; font-size:20px;
+    color:var(--gold-light); margin-bottom:18px;
+  }
+  .modal-close {
+    position:absolute; top:14px; right:16px; background:none;
+    border:none; color:var(--text-muted); font-size:20px; cursor:pointer;
+  }
+  .modal-close:hover { color:var(--text); }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; }
+  .modal-actions .btn { flex:1; }
 </style>
 </head>
 <body>
@@ -778,8 +801,8 @@
         </div>
         <div class="grid-2" style="margin-top:12px;">
           <div>
-            <label>數量</label>
-            <input type="number" id="mat-qty" value="1" min="0" step="0.1">
+            <label>進貨數量</label>
+            <input type="number" id="mat-qty" value="1" min="0" step="0.1" oninput="updateMatUnitCost()">
           </div>
           <div>
             <label>單位</label>
@@ -798,7 +821,12 @@
         </div>
         <div style="margin-top:12px;">
           <label>進貨金額 (NT$)</label>
-          <input type="number" id="mat-amount" value="0" min="0">
+          <input type="number" id="mat-amount" value="0" min="0" oninput="updateMatUnitCost()">
+        </div>
+        <div id="mat-unit-cost-display" style="margin-top:6px;font-size:12px;color:var(--gold-light);display:none;"></div>
+        <div style="margin-top:12px;">
+          <label>已使用數量（選填）</label>
+          <input type="number" id="mat-used" value="0" min="0" step="0.1" placeholder="從上次記錄延續">
         </div>
         <div style="margin-top:12px;">
           <label>庫存狀態</label>
@@ -960,25 +988,21 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-title">🏪 新增市集場次</div>
-        <div class="input-group">
-          <div>
-            <label>市集名稱</label>
-            <input type="text" id="market-name" placeholder="例：三創市集">
-          </div>
-          <div>
-            <label>日期</label>
-            <input type="date" id="market-date">
-          </div>
+        <div style="margin-bottom:12px;">
+          <label>市集名稱</label>
+          <input type="text" id="market-name" placeholder="例：三創市集">
         </div>
-        <div class="grid-2">
-          <div>
-            <label>攤位費 (NT$)</label>
-            <input type="number" id="market-booth" value="1500">
-          </div>
-          <div>
-            <label>其他費用 (NT$)</label>
-            <input type="number" id="market-other" value="0" placeholder="交通、餐費...">
-          </div>
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div><label>開始日期</label><input type="date" id="market-date-start"></div>
+          <div><label>結束日期</label><input type="date" id="market-date-end"></div>
+        </div>
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div><label>攤位費 (NT$)</label><input type="number" id="market-booth" value="0"></div>
+          <div><label>押金 (NT$)</label><input type="number" id="market-deposit" value="0" placeholder="可退還"></div>
+        </div>
+        <div class="grid-2" style="margin-bottom:12px;">
+          <div><label>硬體租借費 (NT$)</label><input type="number" id="market-hardware" value="0"></div>
+          <div><label>其他費用 (NT$)</label><input type="number" id="market-other" value="0" placeholder="交通、餐費..."></div>
         </div>
         <hr class="divider">
         <div class="card-title">市集銷售</div>
@@ -1013,6 +1037,7 @@
               <th>市集名稱</th>
               <th>日期</th>
               <th>攤位費</th>
+              <th>費用合計</th>
               <th>銷售收入</th>
               <th>件數</th>
               <th>淨利</th>
@@ -1036,14 +1061,14 @@
         <div class="grid-2">
           <div>
             <label>類型</label>
-            <select id="cf-type">
+            <select id="cf-type" onchange="onCfTypeChange()">
               <option value="income">收入</option>
               <option value="expense">支出</option>
             </select>
           </div>
           <div>
             <label>類別</label>
-            <select id="cf-cat">
+            <select id="cf-cat" onchange="onCfCatChange()">
               <option value="訂單">訂單銷售</option>
               <option value="市集">市集銷售</option>
               <option value="課程">課程收入</option>
@@ -1057,6 +1082,17 @@
               <option value="其他收入">其他收入</option>
             </select>
           </div>
+        </div>
+        <!-- 作品選擇區（收入・訂單時顯示）-->
+        <div id="cf-product-row" style="margin-top:12px;display:none;">
+          <label>選擇作品</label>
+          <select id="cf-product-select" onchange="onCfProductSelect()">
+            <option value="">── 手動填寫 ──</option>
+          </select>
+        </div>
+        <div id="cf-qty-row" style="margin-top:12px;display:none;">
+          <label>數量</label>
+          <input type="number" id="cf-qty" value="1" min="1" oninput="onCfQtyChange()">
         </div>
         <div style="margin-top:12px;">
           <label>日期</label>
@@ -1114,6 +1150,107 @@
     </div>
   </div>
 
+</div>
+
+
+<!-- ── EDIT MODALS ── -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('product')">×</button>
+    <div class="modal-title">✏️ 編輯作品</div>
+    <input type="hidden" id="edit-prod-id">
+    <div style="margin-bottom:12px;"><label>作品名稱</label><input type="text" id="edit-prod-name"></div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>售價 (NT$)</label><input type="number" id="edit-prod-price"></div>
+      <div><label>狀態</label>
+        <select id="edit-prod-status">
+          <option>販售中</option><option>已售出</option><option>展示品</option><option>訂製中</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>材料成本 (NT$)</label><input type="number" id="edit-prod-mat"></div>
+      <div><label>工時成本 (NT$)</label><input type="number" id="edit-prod-labor"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('product')">取消</button>
+      <button class="btn btn-gold" onclick="saveEditProduct()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-material">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('material')">×</button>
+    <div class="modal-title">✏️ 編輯材料</div>
+    <input type="hidden" id="edit-mat-id">
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>品名</label><input type="text" id="edit-mat-name"></div>
+      <div><label>店家</label><input type="text" id="edit-mat-shop"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>類別</label>
+        <select id="edit-mat-cat">
+          <option>皮革</option><option>五金</option><option>線材</option><option>工具</option><option>包裝</option><option>其他</option>
+        </select>
+      </div>
+      <div><label>庫存狀態</label>
+        <select id="edit-mat-stock">
+          <option>充足</option><option>偏低</option><option>已用完</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>尺寸/規格</label><input type="text" id="edit-mat-size"></div>
+      <div><label>顏色</label><input type="text" id="edit-mat-color"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>進貨數量</label><input type="number" id="edit-mat-qty" step="0.1"></div>
+      <div><label>單位</label>
+        <select id="edit-mat-unit">
+          <option>張</option><option>尺</option><option>公尺</option><option>個</option><option>組</option><option>克</option><option>捲</option><option>包</option><option>件</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>進貨金額 (NT$)</label><input type="number" id="edit-mat-amount"></div>
+      <div><label>已使用數量</label><input type="number" id="edit-mat-used" step="0.1" placeholder="0"></div>
+    </div>
+    <div style="margin-bottom:12px;"><label>備註</label><input type="text" id="edit-mat-note"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('material')">取消</button>
+      <button class="btn btn-gold" onclick="saveEditMaterial()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-market">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('market')">×</button>
+    <div class="modal-title">✏️ 編輯市集</div>
+    <input type="hidden" id="edit-mkt-id">
+    <div style="margin-bottom:12px;"><label>市集名稱</label><input type="text" id="edit-mkt-name"></div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>開始日期</label><input type="date" id="edit-mkt-date-start"></div>
+      <div><label>結束日期</label><input type="date" id="edit-mkt-date-end"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>攤位費 (NT$)</label><input type="number" id="edit-mkt-booth"></div>
+      <div><label>押金 (NT$)</label><input type="number" id="edit-mkt-deposit"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>硬體租借費 (NT$)</label><input type="number" id="edit-mkt-hardware"></div>
+      <div><label>其他費用 (NT$)</label><input type="number" id="edit-mkt-other"></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:12px;">
+      <div><label>銷售收入 (NT$)</label><input type="number" id="edit-mkt-income"></div>
+      <div><label>販售件數</label><input type="number" id="edit-mkt-sold"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('market')">取消</button>
+      <button class="btn btn-gold" onclick="saveEditMarket()">儲存</button>
+    </div>
+  </div>
 </div>
 
 
@@ -1587,51 +1724,75 @@ async function deleteCourse(id) {
 
 // ===== MARKET =====
 function updateMarketPreview() {
-  const booth = parseFloat(document.getElementById('market-booth').value) || 0;
-  const other = parseFloat(document.getElementById('market-other').value) || 0;
-  const income = parseFloat(document.getElementById('market-income').value) || 0;
-  const sold = parseInt(document.getElementById('market-sold').value) || 0;
+  const booth    = parseFloat(document.getElementById('market-booth').value) || 0;
+  const deposit  = parseFloat(document.getElementById('market-deposit').value) || 0;
+  const hardware = parseFloat(document.getElementById('market-hardware').value) || 0;
+  const other    = parseFloat(document.getElementById('market-other').value) || 0;
+  const income   = parseFloat(document.getElementById('market-income').value) || 0;
+  const sold     = parseInt(document.getElementById('market-sold').value) || 0;
+  const ds       = document.getElementById('market-date-start').value;
+  const de       = document.getElementById('market-date-end').value;
+  let days = 1;
+  if (ds && de) { const diff = (new Date(de)-new Date(ds))/(1000*60*60*24); days = diff >= 0 ? diff+1 : 1; }
 
-  const totalCost = booth + other;
+  const totalCost = booth + hardware + other; // 押金不計入成本（可退）
   const profit = income - totalCost;
   const avgPerItem = sold > 0 ? (income / sold).toFixed(0) : 0;
   const profitRate = income > 0 ? ((profit / income)*100).toFixed(1) : 0;
 
-  document.getElementById('market-preview').innerHTML = `
+  document.getElementById('market-preview').innerHTML = \`
     <div class="result-box">
-      <div class="result-row"><span class="label">銷售收入</span><span class="value profit-positive">NT$ ${income.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">販售件數</span><span class="value">${sold} 件</span></div>
-      <div class="result-row"><span class="label">每件平均售價</span><span class="value">NT$ ${avgPerItem}</span></div>
-      <div class="result-row"><span class="label">攤位費</span><span class="value">NT$ ${booth.toLocaleString()}</span></div>
-      <div class="result-row"><span class="label">其他費用</span><span class="value">NT$ ${other.toLocaleString()}</span></div>
-      <div class="result-row highlight"><span class="label">淨利</span><span class="value ${profit>=0?'profit-positive':'profit-negative'}">NT$ ${profit.toLocaleString()} (${profitRate}%)</span></div>
+      <div class="result-row"><span class="label">活動天數</span><span class="value">\${days} 天</span></div>
+      <div class="result-row"><span class="label">銷售收入</span><span class="value profit-positive">NT$ \${income.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">販售件數</span><span class="value">\${sold} 件</span></div>
+      <div class="result-row"><span class="label">每件平均售價</span><span class="value">NT$ \${avgPerItem}</span></div>
+      <div class="result-row"><span class="label">攤位費</span><span class="value">NT$ \${booth.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">押金（可退）</span><span class="value" style="color:var(--text-muted)">NT$ \${deposit.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">硬體租借</span><span class="value">NT$ \${hardware.toLocaleString()}</span></div>
+      <div class="result-row"><span class="label">其他費用</span><span class="value">NT$ \${other.toLocaleString()}</span></div>
+      <div class="result-row highlight"><span class="label">淨利</span><span class="value \${profit>=0?'profit-positive':'profit-negative'}">NT$ \${profit.toLocaleString()} (\${profitRate}%)</span></div>
     </div>
-  `;
+  \`;
 }
 
 async function addMarket() {
   const name = document.getElementById('market-name').value;
   if (!name) { toast('請輸入市集名稱'); return; }
-  const date = document.getElementById('market-date').value;
-  const booth = parseFloat(document.getElementById('market-booth').value) || 0;
-  const other = parseFloat(document.getElementById('market-other').value) || 0;
-  const income = parseFloat(document.getElementById('market-income').value) || 0;
-  const sold = parseInt(document.getElementById('market-sold').value) || 0;
+  const dateStart  = document.getElementById('market-date-start').value;
+  const dateEnd    = document.getElementById('market-date-end').value || dateStart;
+  const booth      = parseFloat(document.getElementById('market-booth').value) || 0;
+  const deposit    = parseFloat(document.getElementById('market-deposit').value) || 0;
+  const hardware   = parseFloat(document.getElementById('market-hardware').value) || 0;
+  const other      = parseFloat(document.getElementById('market-other').value) || 0;
+  const income     = parseFloat(document.getElementById('market-income').value) || 0;
+  const sold       = parseInt(document.getElementById('market-sold').value) || 0;
+  let days = 1;
+  if (dateStart && dateEnd) { const diff=(new Date(dateEnd)-new Date(dateStart))/(1000*60*60*24); days=diff>=0?diff+1:1; }
 
-  const totalCost = booth + other;
+  const totalCost = booth + hardware + other;
   const profit = income - totalCost;
 
-  const record = { id: Date.now(), name, date, booth, other, totalCost, income, sold, profit };
+  const record = { id: Date.now(), name, dateStart, dateEnd, days, booth, deposit, hardware, other, totalCost, income, sold, profit };
   state.markets.push(record);
   await fbSave('markets', record);
 
-  const cf1 = { id: Date.now()+1, date, type:'income', cat:'市集', desc:`市集銷售：${name}`, amount: income };
-  await fbSave('cashflow', cf1);
+  if (income > 0) {
+    const cf1 = { id: Date.now()+1, date: dateStart, type:'income', cat:'市集', desc:`市集銷售：${name}`, amount: income };
+    await fbSave('cashflow', cf1);
+  }
   if (totalCost > 0) {
-    const cf2 = { id: Date.now()+2, date, type:'expense', cat:'攤位', desc:`市集費用：${name}`, amount: totalCost };
+    const cf2 = { id: Date.now()+2, date: dateStart, type:'expense', cat:'攤位', desc:`市集費用：${name}`, amount: totalCost };
     await fbSave('cashflow', cf2);
   }
+  if (deposit > 0) {
+    const cf3 = { id: Date.now()+3, date: dateStart, type:'expense', cat:'攤位', desc:`押金（可退）：${name}`, amount: deposit };
+    await fbSave('cashflow', cf3);
+  }
 
+  // reset
+  ['market-name','market-booth','market-deposit','market-hardware','market-other','market-income','market-sold'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value = id.includes('name')?'':'0';
+  });
   toast('✓ 市集記錄已新增');
 }
 
@@ -1641,16 +1802,22 @@ function renderMarkets() {
   tbody.innerHTML = '';
   if (!state.markets.length) { empty.style.display='block'; return; }
   empty.style.display='none';
-  state.markets.forEach(m => {
+  [...state.markets].sort((a,b)=>(b.dateStart||b.date||'').localeCompare(a.dateStart||a.date||'')).forEach(m => {
+    const dateLabel = m.dateStart ? (m.dateEnd && m.dateEnd!==m.dateStart ? m.dateStart+' ~ '+m.dateEnd.slice(5) : m.dateStart) : (m.date||'');
+    const costLabel = `NT$ ${(m.totalCost||0).toLocaleString()}${m.deposit?` (+押金 NT$${m.deposit.toLocaleString()})` : ''}`;
     tbody.innerHTML += `
       <tr>
         <td>${m.name}</td>
-        <td>${m.date}</td>
-        <td>NT$ ${m.booth.toLocaleString()}</td>
-        <td class="profit-positive">NT$ ${m.income.toLocaleString()}</td>
-        <td>${m.sold} 件</td>
-        <td class="${m.profit>=0?'profit-positive':'profit-negative'}">NT$ ${m.profit.toLocaleString()}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteMarket(${m.id})">刪除</button></td>
+        <td style="white-space:nowrap;">${dateLabel}${m.days&&m.days>1?' ('+m.days+'天)':''}</td>
+        <td>NT$ ${(m.booth||0).toLocaleString()}</td>
+        <td style="font-size:11px;">${costLabel}</td>
+        <td class="profit-positive">NT$ ${(m.income||0).toLocaleString()}</td>
+        <td>${m.sold||0} 件</td>
+        <td class="${(m.profit||0)>=0?'profit-positive':'profit-negative'}">NT$ ${(m.profit||0).toLocaleString()}</td>
+        <td style="display:flex;gap:4px;">
+          <button class="btn btn-sm btn-outline" onclick="openEditMarket(${m.id})">編輯</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMarket(${m.id})">刪除</button>
+        </td>
       </tr>`;
   });
 }
@@ -1913,6 +2080,9 @@ async function addMaterial() {
   if (!name) { toast('請輸入品名'); return; }
   const amount = parseFloat(document.getElementById('mat-amount').value) || 0;
   const date = document.getElementById('mat-date').value;
+  const qty = parseFloat(document.getElementById('mat-qty').value) || 1;
+  const unit = document.getElementById('mat-unit').value;
+  const unitCost = qty > 0 ? (amount / qty) : 0;
   const record = {
     id: Date.now(),
     date,
@@ -1921,8 +2091,10 @@ async function addMaterial() {
     name,
     size: document.getElementById('mat-size').value,
     color: document.getElementById('mat-color').value,
-    qty: parseFloat(document.getElementById('mat-qty').value) || 1,
-    unit: document.getElementById('mat-unit').value,
+    qty,
+    unit,
+    unitCost,
+    usedQty: parseFloat(document.getElementById('mat-used').value) || 0,
     amount,
     stock: document.getElementById('mat-stock').value,
     note: document.getElementById('mat-note').value,
@@ -1983,7 +2155,9 @@ function renderMaterials() {
               🏪 ${m.shop || '—'}<br>
               📅 ${m.date}<br>
               📐 ${m.size || '—'}　${m.color ? '🎨 ' + m.color : ''}<br>
-              📦 ${m.qty} ${m.unit}　💰 NT$ ${m.amount.toLocaleString()}
+              📦 進貨 ${m.qty} ${m.unit}　已用 ${m.usedQty||0} ${m.unit}<br>
+              ✅ 剩餘 <strong style="color:var(--gold-light)">${Math.max(0,(m.qty||0)-(m.usedQty||0)).toFixed(2).replace(/\.?0+$/,'')} ${m.unit}</strong><br>
+              💰 NT$ ${(m.amount||0).toLocaleString()}${m.unitCost ? ' ／ ' + m.unitCost.toFixed(1) + ' NT$/' + m.unit : ''}
               ${m.note ? '<br>📝 ' + m.note : ''}
             </div>
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -1999,7 +2173,10 @@ function renderMaterials() {
                 <option${m.stock==='已用完'?' selected':''}>已用完</option>
               </select>
             </div>
-            <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">刪除</button>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-sm btn-outline" onclick="openEditMaterial(${m.id})">編輯</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">刪除</button>
+            </div>
           </div>
         </div>`;
     }).join('');
@@ -2071,6 +2248,182 @@ async function addQuickProduct() {
   toast('✓ 作品已新增');
 }
 
+
+// ===== MODAL HELPERS =====
+function openModal(name) { document.getElementById('modal-'+name).classList.add('open'); }
+function closeModal(name) { document.getElementById('modal-'+name).classList.remove('open'); }
+
+// ===== EDIT PRODUCT =====
+function openEditProduct(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('edit-prod-id').value = p.id;
+  document.getElementById('edit-prod-name').value = p.name;
+  document.getElementById('edit-prod-price').value = p.price || 0;
+  document.getElementById('edit-prod-status').value = p.status || '販售中';
+  document.getElementById('edit-prod-mat').value = p.materialCost || 0;
+  document.getElementById('edit-prod-labor').value = p.laborCost || 0;
+  openModal('product');
+}
+async function saveEditProduct() {
+  const id = parseInt(document.getElementById('edit-prod-id').value);
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  p.name = document.getElementById('edit-prod-name').value;
+  p.price = parseFloat(document.getElementById('edit-prod-price').value) || 0;
+  p.status = document.getElementById('edit-prod-status').value;
+  p.materialCost = parseFloat(document.getElementById('edit-prod-mat').value) || 0;
+  p.laborCost = parseFloat(document.getElementById('edit-prod-labor').value) || 0;
+  p.totalCost = p.materialCost + p.laborCost;
+  p.profitRate = p.price > 0 ? (((p.price - p.totalCost) / p.price) * 100).toFixed(1) : '—';
+  await fbSave('products', p);
+  closeModal('product');
+  toast('✓ 作品已更新');
+}
+
+// ===== EDIT MATERIAL =====
+function openEditMaterial(id) {
+  const m = state.materials.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('edit-mat-id').value = m.id;
+  document.getElementById('edit-mat-name').value = m.name;
+  document.getElementById('edit-mat-shop').value = m.shop || '';
+  document.getElementById('edit-mat-cat').value = m.cat;
+  document.getElementById('edit-mat-stock').value = m.stock;
+  document.getElementById('edit-mat-size').value = m.size || '';
+  document.getElementById('edit-mat-color').value = m.color || '';
+  document.getElementById('edit-mat-qty').value = m.qty || 1;
+  document.getElementById('edit-mat-unit').value = m.unit || '張';
+  document.getElementById('edit-mat-amount').value = m.amount || 0;
+  document.getElementById('edit-mat-used').value = m.usedQty || 0;
+  document.getElementById('edit-mat-note').value = m.note || '';
+  openModal('material');
+}
+async function saveEditMaterial() {
+  const id = parseInt(document.getElementById('edit-mat-id').value);
+  const m = state.materials.find(x => x.id === id);
+  if (!m) return;
+  m.name = document.getElementById('edit-mat-name').value;
+  m.shop = document.getElementById('edit-mat-shop').value;
+  m.cat = document.getElementById('edit-mat-cat').value;
+  m.stock = document.getElementById('edit-mat-stock').value;
+  m.size = document.getElementById('edit-mat-size').value;
+  m.color = document.getElementById('edit-mat-color').value;
+  m.qty = parseFloat(document.getElementById('edit-mat-qty').value) || 1;
+  m.unit = document.getElementById('edit-mat-unit').value;
+  m.amount = parseFloat(document.getElementById('edit-mat-amount').value) || 0;
+  m.usedQty = parseFloat(document.getElementById('edit-mat-used').value) || 0;
+  m.unitCost = m.qty > 0 ? m.amount / m.qty : 0;
+  m.note = document.getElementById('edit-mat-note').value;
+  // auto update stock status
+  const remaining = m.qty - m.usedQty;
+  if (remaining <= 0) m.stock = '已用完';
+  else if (remaining / m.qty < 0.25) m.stock = '偏低';
+  else m.stock = m.stock === '已用完' ? '充足' : m.stock;
+  await fbSave('materials', m);
+  closeModal('material');
+  toast('✓ 材料已更新');
+}
+
+// ===== EDIT MARKET =====
+function openEditMarket(id) {
+  const m = state.markets.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('edit-mkt-id').value = m.id;
+  document.getElementById('edit-mkt-name').value = m.name;
+  document.getElementById('edit-mkt-date-start').value = m.dateStart || m.date || '';
+  document.getElementById('edit-mkt-date-end').value = m.dateEnd || m.date || '';
+  document.getElementById('edit-mkt-booth').value = m.booth || 0;
+  document.getElementById('edit-mkt-deposit').value = m.deposit || 0;
+  document.getElementById('edit-mkt-hardware').value = m.hardware || 0;
+  document.getElementById('edit-mkt-other').value = m.other || 0;
+  document.getElementById('edit-mkt-income').value = m.income || 0;
+  document.getElementById('edit-mkt-sold').value = m.sold || 0;
+  openModal('market');
+}
+async function saveEditMarket() {
+  const id = parseInt(document.getElementById('edit-mkt-id').value);
+  const m = state.markets.find(x => x.id === id);
+  if (!m) return;
+  m.name = document.getElementById('edit-mkt-name').value;
+  m.dateStart = document.getElementById('edit-mkt-date-start').value;
+  m.dateEnd = document.getElementById('edit-mkt-date-end').value;
+  m.booth = parseFloat(document.getElementById('edit-mkt-booth').value) || 0;
+  m.deposit = parseFloat(document.getElementById('edit-mkt-deposit').value) || 0;
+  m.hardware = parseFloat(document.getElementById('edit-mkt-hardware').value) || 0;
+  m.other = parseFloat(document.getElementById('edit-mkt-other').value) || 0;
+  m.income = parseFloat(document.getElementById('edit-mkt-income').value) || 0;
+  m.sold = parseInt(document.getElementById('edit-mkt-sold').value) || 0;
+  m.totalCost = m.booth + m.hardware + m.other;
+  m.profit = m.income - m.totalCost;
+  if (m.dateStart && m.dateEnd) {
+    const diff = (new Date(m.dateEnd) - new Date(m.dateStart)) / (1000*60*60*24);
+    m.days = diff >= 0 ? diff + 1 : 1;
+  }
+  await fbSave('markets', m);
+  closeModal('market');
+  toast('✓ 市集記錄已更新');
+}
+
+// ===== CASHFLOW PRODUCT SELECTOR =====
+function onCfTypeChange() {
+  const type = document.getElementById('cf-type').value;
+  const catEl = document.getElementById('cf-cat');
+  if (type === 'income') {
+    catEl.innerHTML = `<option value="訂單">訂單銷售</option><option value="市集">市集銷售</option><option value="課程">課程收入</option><option value="其他收入">其他收入</option>`;
+  } else {
+    catEl.innerHTML = `<option value="皮革">皮革材料</option><option value="五金">五金配件</option><option value="線材">線材</option><option value="工具">工具設備</option><option value="包裝">包裝材料</option><option value="攤位">攤位費</option><option value="其他支出">其他支出</option>`;
+  }
+  onCfCatChange();
+}
+function onCfCatChange() {
+  const cat = document.getElementById('cf-cat').value;
+  const isOrderIncome = cat === '訂單';
+  document.getElementById('cf-product-row').style.display = isOrderIncome ? 'block' : 'none';
+  document.getElementById('cf-qty-row').style.display = isOrderIncome ? 'block' : 'none';
+  if (isOrderIncome) populateCfProductSelect();
+}
+function populateCfProductSelect() {
+  const sel = document.getElementById('cf-product-select');
+  const products = state.products.filter(p => p.price > 0);
+  sel.innerHTML = '<option value="">── 手動填寫 ──</option>' +
+    products.map(p => `<option value="${p.id}" data-price="${p.price}">${p.name}（NT$ ${p.price.toLocaleString()}）</option>`).join('');
+}
+function onCfProductSelect() {
+  const sel = document.getElementById('cf-product-select');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt.value) return;
+  const price = parseFloat(opt.dataset.price) || 0;
+  const qty = parseFloat(document.getElementById('cf-qty').value) || 1;
+  const prod = state.products.find(p => p.id === parseInt(opt.value));
+  document.getElementById('cf-desc').value = `銷售：${prod ? prod.name : ''}`;
+  document.getElementById('cf-amount').value = price * qty;
+}
+function onCfQtyChange() {
+  const sel = document.getElementById('cf-product-select');
+  if (!sel.value) return;
+  const opt = sel.options[sel.selectedIndex];
+  const price = parseFloat(opt.dataset.price) || 0;
+  const qty = parseFloat(document.getElementById('cf-qty').value) || 1;
+  document.getElementById('cf-amount').value = price * qty;
+  const prod = state.products.find(p => p.id === parseInt(sel.value));
+  document.getElementById('cf-desc').value = qty > 1 ? `銷售：${prod ? prod.name : ''} x${qty}` : `銷售：${prod ? prod.name : ''}`;
+}
+
+// ===== MATERIAL UNIT COST DISPLAY =====
+function updateMatUnitCost() {
+  const qty = parseFloat(document.getElementById('mat-qty').value) || 0;
+  const amount = parseFloat(document.getElementById('mat-amount').value) || 0;
+  const display = document.getElementById('mat-unit-cost-display');
+  const unit = document.getElementById('mat-unit').value;
+  if (qty > 0 && amount > 0) {
+    display.style.display = 'block';
+    display.textContent = `每 1 ${unit} = NT$ ${(amount/qty).toFixed(2)}`;
+  } else {
+    display.style.display = 'none';
+  }
+}
+
 // ===== RENDER ALL =====
 function renderAll() {
   renderDashboard();
@@ -2111,11 +2464,24 @@ window.renderCashflow = renderCashflow;
 window.renderDashboard = renderDashboard;
 window.renderMaterials = renderMaterials;
 window.renderProducts = renderProducts;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.openEditProduct = openEditProduct;
+window.saveEditProduct = saveEditProduct;
+window.openEditMaterial = openEditMaterial;
+window.saveEditMaterial = saveEditMaterial;
+window.openEditMarket = openEditMarket;
+window.saveEditMarket = saveEditMarket;
+window.onCfTypeChange = onCfTypeChange;
+window.onCfCatChange = onCfCatChange;
+window.onCfProductSelect = onCfProductSelect;
+window.onCfQtyChange = onCfQtyChange;
+window.updateMatUnitCost = updateMatUnitCost;
 
 // Live preview for course & market
 document.addEventListener('input', e => {
   const courseIds = ['course-name','course-date','course-students','course-fee','course-material','course-venue','course-hours','course-prep','course-hourly'];
-  const marketIds = ['market-booth','market-other','market-income','market-sold'];
+  const marketIds = ['market-booth','market-deposit','market-hardware','market-other','market-income','market-sold','market-date-start','market-date-end'];
   if (courseIds.includes(e.target.id)) updateCoursePreview();
   if (marketIds.includes(e.target.id)) updateMarketPreview();
 });
