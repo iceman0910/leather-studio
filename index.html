@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>皮革工作室管理系統</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="text/javascript" nonce="5d060c38f46b441393138c2e955" src="//local.adguard.org?ts=1775049267523&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F0%2F%3Fui%3D2%26ik%3D2b14a674cc%26attid%3D0.1%26permmsgid%3Dmsg-f%3A1861274359977620583%26th%3D19d4932b40023467%26view%3Datt%26disp%3Dsafe%26realattid%3D63479839-74AB-497C-88D3-8FD7229E252B%26zw%26saddbat%3DANGjdJ_5E9BNBvEnLIROM06W7gPLjaOsIbsBU2GIkHf0tfttubjnWJ_2NTEMmC1yuhL7_CNEVcEA-WLmlHfgbT9JyWxKts-XN_3p5RbHPodwP3Yw72tbC6mCOfJWQeEzW44a7z7Hw2EFYDfO6SFx3OCY36InV0Y32nY86XMVGySyuWJRwfoZc9N5cy_SiRwdzMKIB6gHQbyLdW4cOwITT1oSb46wbIggkwWcavvk7oemtVDiUa0iNtuCedB24knOpbNHreXELsMeR_mLMVmCgUgeuH4EgEnAMcv83OWwoZE_t_M6RgX5ZX-8F01mndaWQdFtOQuchyceCq3QYEl-o0b7kzE6QsVL8RPMvU5T2YFNYzTb4qDmE7f33i_PqK7vyzfSdfSkXvflUmOHQ3ufuGg6xwLqmCtmkpQNpA2js_21Cu--evnjn_DSl4JX7dJW3dIQZMX-ZDTzgsDEjwqoOXboaN59MZY-9kw6JHcVl_efs4hnsk8-eQcMLURQEGRO3OuwKCJQb15ZwrCqSXzckpBXtDGSFOnJLcOvrl0oBrZ8kFl0vZeBxRG_MZYPZkoTChH-0EXjlPgTcA3Ygivc6PXF3LjE4SDya2UVfETF_fqbEm23GWk1Mo4L5J8z_pqP8tbjaatt2UnTZOfreQ9gXCmunfTYxh1w1Cuw0RhfOsozoFXjuHQb2kcSX5OR7g-SDVyEy5Janww7CriVW5xmKxv_Yi3V33TtTN38Qz3chS25fpHxjKtVT0Ya6q4nF4uF_6eWKE6mIk0AdDhlU_xkIjsXnv6zctivLnJPiXRDz_YRsAHoh7aSEMLF9C1suNo-rj4MmldHNpwP_R78SoawMAoyjtLV4xz-uekqXbRC3ikrXIs5yNkwTnHptm4dqqqhn-nHeTnmSMqtvID1r9_-Gxoq6wtkm38K-kLn0baOaTMyFNlvcIx4g9wur8t5L7Es5VsJ7TtwJULnjwOAFD9xEFwP1ARumQh5UumAMLu3TJYbHiS5odTotOPVooILFJfB6qpgORm3Y40cn4A2SR4IEdmXy4YyKGC9CzUpBGW2sB4-TmUJHSsb164KJ4kbA7Y&amp;app=com.apple.Safari&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="5d060c38f46b441393138c2e955" src="//local.adguard.org?ts=1775049267523&amp;name=AdGuard%20Extra&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #F5EFE6;
@@ -1593,7 +1593,10 @@ function renderProducts() {
             <select style="padding:4px 8px;font-size:11px;width:auto;" onchange="updateProductStatus(${p.id}, this.value)">
               ${['販售中','已售出','展示品','訂製中'].map(s => `<option${(p.status||'販售中')===s?' selected':''}>${s}</option>`).join('')}
             </select>
-            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">刪除</button>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-sm btn-outline" onclick="openEditProduct(${p.id})">編輯</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">刪除</button>
+            </div>
           </div>
         </div>`;
     }).join('');
