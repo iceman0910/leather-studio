@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>皮革工作室管理系統</title>
-<script type="text/javascript" nonce="5d060c38f46b441393138c2e955" src="//local.adguard.org?ts=1775049267523&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F0%2F%3Fui%3D2%26ik%3D2b14a674cc%26attid%3D0.1%26permmsgid%3Dmsg-f%3A1861274359977620583%26th%3D19d4932b40023467%26view%3Datt%26disp%3Dsafe%26realattid%3D63479839-74AB-497C-88D3-8FD7229E252B%26zw%26saddbat%3DANGjdJ_5E9BNBvEnLIROM06W7gPLjaOsIbsBU2GIkHf0tfttubjnWJ_2NTEMmC1yuhL7_CNEVcEA-WLmlHfgbT9JyWxKts-XN_3p5RbHPodwP3Yw72tbC6mCOfJWQeEzW44a7z7Hw2EFYDfO6SFx3OCY36InV0Y32nY86XMVGySyuWJRwfoZc9N5cy_SiRwdzMKIB6gHQbyLdW4cOwITT1oSb46wbIggkwWcavvk7oemtVDiUa0iNtuCedB24knOpbNHreXELsMeR_mLMVmCgUgeuH4EgEnAMcv83OWwoZE_t_M6RgX5ZX-8F01mndaWQdFtOQuchyceCq3QYEl-o0b7kzE6QsVL8RPMvU5T2YFNYzTb4qDmE7f33i_PqK7vyzfSdfSkXvflUmOHQ3ufuGg6xwLqmCtmkpQNpA2js_21Cu--evnjn_DSl4JX7dJW3dIQZMX-ZDTzgsDEjwqoOXboaN59MZY-9kw6JHcVl_efs4hnsk8-eQcMLURQEGRO3OuwKCJQb15ZwrCqSXzckpBXtDGSFOnJLcOvrl0oBrZ8kFl0vZeBxRG_MZYPZkoTChH-0EXjlPgTcA3Ygivc6PXF3LjE4SDya2UVfETF_fqbEm23GWk1Mo4L5J8z_pqP8tbjaatt2UnTZOfreQ9gXCmunfTYxh1w1Cuw0RhfOsozoFXjuHQb2kcSX5OR7g-SDVyEy5Janww7CriVW5xmKxv_Yi3V33TtTN38Qz3chS25fpHxjKtVT0Ya6q4nF4uF_6eWKE6mIk0AdDhlU_xkIjsXnv6zctivLnJPiXRDz_YRsAHoh7aSEMLF9C1suNo-rj4MmldHNpwP_R78SoawMAoyjtLV4xz-uekqXbRC3ikrXIs5yNkwTnHptm4dqqqhn-nHeTnmSMqtvID1r9_-Gxoq6wtkm38K-kLn0baOaTMyFNlvcIx4g9wur8t5L7Es5VsJ7TtwJULnjwOAFD9xEFwP1ARumQh5UumAMLu3TJYbHiS5odTotOPVooILFJfB6qpgORm3Y40cn4A2SR4IEdmXy4YyKGC9CzUpBGW2sB4-TmUJHSsb164KJ4kbA7Y&amp;app=com.apple.Safari&amp;css=3&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1"></script><script type="text/javascript" nonce="5d060c38f46b441393138c2e955" src="//local.adguard.org?ts=1775049267523&amp;name=AdGuard%20Extra&amp;type=user-script"></script><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --cream: #F5EFE6;
@@ -870,6 +870,10 @@
 
     <!-- Filter & Cards -->
     <div class="filter-bar" style="margin-top:8px;">
+      <div class="pill-tabs" style="margin-bottom:0;">
+        <button class="pill-tab active" id="mat-view-merged" onclick="setMatView('merged')">📦 合併庫存</button>
+        <button class="pill-tab" id="mat-view-detail" onclick="setMatView('detail')">📋 進貨明細</button>
+      </div>
       <select id="mat-filter-cat" onchange="renderMaterials()">
         <option value="all">全部類別</option>
         <option value="皮革">皮革</option>
@@ -885,7 +889,7 @@
         <option value="偏低">偏低</option>
         <option value="已用完">已用完</option>
       </select>
-      <input type="text" id="mat-search" placeholder="搜尋品名或店家..." oninput="renderMaterials()" style="max-width:200px;">
+      <input type="text" id="mat-search" placeholder="搜尋品名..." oninput="renderMaterials()" style="max-width:180px;">
     </div>
 
     <div class="material-grid" id="mat-grid"></div>
@@ -2123,95 +2127,228 @@ async function addMaterial() {
   toast('✓ 進貨記錄已新增');
 }
 
+let matViewMode = 'merged'; // 'merged' | 'detail'
+
+function setMatView(mode) {
+  matViewMode = mode;
+  document.getElementById('mat-view-merged').classList.toggle('active', mode === 'merged');
+  document.getElementById('mat-view-detail').classList.toggle('active', mode === 'detail');
+  renderMaterials();
+}
+
 function renderMaterials() {
-  const filterCat = document.getElementById('mat-filter-cat')?.value || 'all';
+  const filterCat   = document.getElementById('mat-filter-cat')?.value || 'all';
   const filterStock = document.getElementById('mat-filter-stock')?.value || 'all';
-  const search = (document.getElementById('mat-search')?.value || '').toLowerCase();
-
-  let data = [...state.materials].sort((a,b) => b.date.localeCompare(a.date));
-  if (filterCat !== 'all') data = data.filter(m => m.cat === filterCat);
-  if (filterStock !== 'all') data = data.filter(m => m.stock === filterStock);
-  if (search) data = data.filter(m => m.name.toLowerCase().includes(search) || (m.shop||'').toLowerCase().includes(search));
-
-  const grid = document.getElementById('mat-grid');
+  const search      = (document.getElementById('mat-search')?.value || '').toLowerCase();
+  const grid  = document.getElementById('mat-grid');
   const empty = document.getElementById('mat-empty');
+  const catIcons = { '皮革':'🟤','五金':'⚙️','線材':'🧵','工具':'🔨','包裝':'📦','其他':'📎' };
 
-  if (!data.length) { grid.innerHTML = ''; empty.style.display = 'block'; }
-  else {
-    empty.style.display = 'none';
-    const catIcons = { '皮革':'🟤','五金':'⚙️','線材':'🧵','工具':'🔨','包裝':'📦','其他':'📎' };
-    grid.innerHTML = data.map(m => {
-      const stockClass = m.stock === '充足' ? 'stock-ok' : m.stock === '偏低' ? 'stock-low' : 'stock-empty';
-      const imgHtml = m.photos && m.photos.length
-        ? `<img class="material-card-img" src="${m.photos[0]}" onclick="openLightbox('${m.photos[0]}')" style="cursor:zoom-in;" alt="">`
-        : `<div class="material-card-img-placeholder">${catIcons[m.cat]||'📎'}</div>`;
-      const extraPhotos = m.photos && m.photos.length > 1
-        ? `<div class="photo-grid" style="padding:8px 14px 0;">${m.photos.slice(1).map(src => `<div class="photo-thumb" onclick="openLightbox('${src}')"><img src="${src}" alt=""></div>`).join('')}</div>`
-        : '';
-      return `
-        <div class="material-card">
-          ${imgHtml}
-          ${extraPhotos}
-          <div class="material-card-body">
-            <div class="material-card-name">${m.name}</div>
-            <div class="material-card-meta">
-              🏪 ${m.shop || '—'}<br>
-              📅 ${m.date}<br>
-              📐 ${m.size || '—'}　${m.color ? '🎨 ' + m.color : ''}<br>
-              📦 進貨 ${m.qty} ${m.unit}　已用 ${m.usedQty||0} ${m.unit}<br>
-              ✅ 剩餘 <strong style="color:var(--gold-light)">${Math.max(0,(m.qty||0)-(m.usedQty||0)).toFixed(2).replace(/\.?0+$/,'')} ${m.unit}</strong><br>
-              💰 NT$ ${(m.amount||0).toLocaleString()}${m.unitCost ? ' ／ ' + m.unitCost.toFixed(1) + ' NT$/' + m.unit : ''}
-              ${m.note ? '<br>📝 ' + m.note : ''}
+  let allData = [...state.materials];
+
+  if (matViewMode === 'merged') {
+    // ── 合併庫存視圖：以品名為 key，合計數量/金額/使用量 ──
+    const mergeMap = {};
+    allData.forEach(m => {
+      const key = m.name.trim();
+      if (!mergeMap[key]) {
+        mergeMap[key] = {
+          name: m.name, cat: m.cat, unit: m.unit,
+          totalQty: 0, totalAmount: 0, totalUsed: 0,
+          shops: new Set(), sizes: new Set(), colors: new Set(),
+          photos: [], ids: [], records: [],
+          latestDate: '',
+        };
+      }
+      const g = mergeMap[key];
+      g.totalQty    += (m.qty || 0);
+      g.totalAmount += (m.amount || 0);
+      g.totalUsed   += (m.usedQty || 0);
+      if (m.shop)  g.shops.add(m.shop);
+      if (m.size)  g.sizes.add(m.size);
+      if (m.color) g.colors.add(m.color);
+      if (m.photos && m.photos.length) g.photos.push(...m.photos);
+      g.ids.push(m.id);
+      g.records.push(m);
+      if ((m.date||'') > g.latestDate) { g.latestDate = m.date; g.cat = m.cat; }
+    });
+
+    let merged = Object.values(mergeMap).map(g => {
+      g.avgUnitCost = g.totalQty > 0 ? g.totalAmount / g.totalQty : 0;
+      g.remaining   = Math.max(0, g.totalQty - g.totalUsed);
+      const ratio   = g.totalQty > 0 ? g.remaining / g.totalQty : 1;
+      g.stock = g.remaining <= 0 ? '已用完' : ratio < 0.25 ? '偏低' : '充足';
+      return g;
+    });
+
+    // filter
+    if (filterCat !== 'all') merged = merged.filter(g => g.cat === filterCat);
+    if (filterStock !== 'all') merged = merged.filter(g => g.stock === filterStock);
+    if (search) merged = merged.filter(g => g.name.toLowerCase().includes(search));
+    merged.sort((a,b) => b.latestDate.localeCompare(a.latestDate));
+
+    if (!merged.length) { grid.innerHTML = ''; empty.style.display = 'block'; }
+    else {
+      empty.style.display = 'none';
+      grid.innerHTML = merged.map(g => {
+        const stockClass = g.stock === '充足' ? 'stock-ok' : g.stock === '偏低' ? 'stock-low' : 'stock-empty';
+        const imgHtml = g.photos.length
+          ? `<img class="material-card-img" src="${g.photos[0]}" onclick="openLightbox('${g.photos[0]}')" style="cursor:zoom-in;" alt="">`
+          : `<div class="material-card-img-placeholder">${catIcons[g.cat]||'📎'}</div>`;
+        const tagCls = g.cat==='皮革'?'order':g.cat==='五金'?'market':'expense';
+        const pctRemain = g.totalQty > 0 ? Math.min(100, (g.remaining / g.totalQty) * 100) : 0;
+        const shopStr  = [...g.shops].join('、') || '—';
+        const sizeStr  = [...g.sizes].filter(Boolean).join('、');
+        const colorStr = [...g.colors].filter(Boolean).join('、');
+        const batchCount = g.records.length;
+        return `
+          <div class="material-card">
+            ${imgHtml}
+            <div class="material-card-body">
+              <div class="material-card-name">${g.name}
+                <span style="font-size:11px;color:var(--text-muted);font-weight:normal;margin-left:6px;">${batchCount} 批進貨</span>
+              </div>
+              <div class="material-card-meta">
+                🏪 ${shopStr}<br>
+                ${sizeStr ? '📐 ' + sizeStr + '<br>' : ''}
+                ${colorStr ? '🎨 ' + colorStr + '<br>' : ''}
+                📦 總進貨 ${g.totalQty} ${g.unit}　已用 ${g.totalUsed.toFixed(2).replace(/\.?0+$/,'')} ${g.unit}<br>
+                💰 總金額 NT$ ${g.totalAmount.toLocaleString()}　平均 <strong style="color:var(--gold-light)">NT$ ${g.avgUnitCost.toFixed(1)} / ${g.unit}</strong>
+              </div>
+              <div style="margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                  <span>剩餘庫存</span>
+                  <strong style="color:var(--gold-light)">${g.remaining.toFixed(2).replace(/\.?0+$/,'')} ${g.unit}</strong>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:${pctRemain}%"></div></div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span class="tag tag-${tagCls}">${g.cat}</span>
+                <span class="stock-badge ${stockClass}">${g.stock}</span>
+              </div>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-              <span class="tag tag-${m.cat==='皮革'?'order':m.cat==='五金'?'market':'expense'}">${m.cat}</span>
-              <span class="stock-badge ${stockClass}">${m.stock}</span>
+            <div class="material-card-footer">
+              <span style="font-size:11px;color:var(--text-muted);">最近進貨 ${g.latestDate}</span>
+              <button class="btn btn-sm btn-outline" onclick="setMatView('detail');document.getElementById('mat-search').value='${g.name.replace(/'/g,'\\x27')}';renderMaterials();">明細</button>
             </div>
-          </div>
-          <div class="material-card-footer">
-            <div style="display:flex;gap:6px;">
+          </div>`;
+      }).join('');
+    }
+
+    // Stats based on merged
+    const allMerged = Object.values(mergeMap);
+    const totalAmount = state.materials.reduce((s,m) => s+(m.amount||0), 0);
+    const stockCounts = { '充足':0, '偏低':0, '已用完':0 };
+    allMerged.forEach(g => {
+      const r = g.totalQty > 0 ? Math.max(0,g.totalQty-g.totalUsed)/g.totalQty : 1;
+      const s = Math.max(0,g.totalQty-g.totalUsed) <= 0 ? '已用完' : r < 0.25 ? '偏低' : '充足';
+      stockCounts[s]++;
+    });
+    const statsEl = document.getElementById('mat-stats');
+    if (statsEl) statsEl.innerHTML = `
+      <div class="result-box">
+        <div class="result-row"><span class="label">品項種類</span><span class="value">${allMerged.length} 種</span></div>
+        <div class="result-row"><span class="label">進貨筆數</span><span class="value">${state.materials.length} 筆</span></div>
+        <div class="result-row"><span class="label">總進貨金額</span><span class="value">NT$ ${totalAmount.toLocaleString()}</span></div>
+        <div class="result-row"><span class="label">庫存充足</span><span class="value profit-positive">${stockCounts['充足']} 種</span></div>
+        <div class="result-row"><span class="label">庫存偏低</span><span class="value" style="color:var(--gold-light)">${stockCounts['偏低']} 種</span></div>
+        <div class="result-row"><span class="label">已用完</span><span class="value profit-negative">${stockCounts['已用完']} 種</span></div>
+      </div>`;
+
+    // Restock based on merged
+    const restockEl = document.getElementById('mat-restock');
+    if (restockEl) {
+      const need = allMerged.filter(g => {
+        const r = g.totalQty > 0 ? Math.max(0,g.totalQty-g.totalUsed)/g.totalQty : 1;
+        return Math.max(0,g.totalQty-g.totalUsed) <= 0 || r < 0.25;
+      });
+      restockEl.innerHTML = need.length
+        ? need.map(g => {
+            const rem = Math.max(0,g.totalQty-g.totalUsed);
+            const s = rem <= 0 ? 'stock-empty' : 'stock-low';
+            const sl = rem <= 0 ? '已用完' : '偏低';
+            return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
+              <span>${g.name} <span style="color:var(--text-muted)">剩 ${rem.toFixed(1)} ${g.unit}</span></span>
+              <span class="stock-badge ${s}">${sl}</span>
+            </div>`;
+          }).join('')
+        : '<div class="empty" style="padding:12px 0;">目前庫存充足 ✓</div>';
+    }
+
+  } else {
+    // ── 進貨明細視圖：逐筆顯示 ──
+    let data = [...allData].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    if (filterCat !== 'all') data = data.filter(m => m.cat === filterCat);
+    if (filterStock !== 'all') data = data.filter(m => m.stock === filterStock);
+    if (search) data = data.filter(m => m.name.toLowerCase().includes(search) || (m.shop||'').toLowerCase().includes(search));
+
+    if (!data.length) { grid.innerHTML = ''; empty.style.display = 'block'; }
+    else {
+      empty.style.display = 'none';
+      grid.innerHTML = data.map(m => {
+        const stockClass = m.stock === '充足' ? 'stock-ok' : m.stock === '偏低' ? 'stock-low' : 'stock-empty';
+        const imgHtml = m.photos && m.photos.length
+          ? `<img class="material-card-img" src="${m.photos[0]}" onclick="openLightbox('${m.photos[0]}')" style="cursor:zoom-in;" alt="">`
+          : `<div class="material-card-img-placeholder">${catIcons[m.cat]||'📎'}</div>`;
+        const remaining = Math.max(0,(m.qty||0)-(m.usedQty||0));
+        return `
+          <div class="material-card">
+            ${imgHtml}
+            <div class="material-card-body">
+              <div class="material-card-name">${m.name}</div>
+              <div class="material-card-meta">
+                🏪 ${m.shop || '—'}　📅 ${m.date||''}<br>
+                ${m.size ? '📐 ' + m.size + '　' : ''}${m.color ? '🎨 ' + m.color + '<br>' : ''}
+                📦 進貨 ${m.qty||0} ${m.unit}　已用 ${(m.usedQty||0)} ${m.unit}<br>
+                ✅ 剩餘 <strong style="color:var(--gold-light)">${remaining.toFixed(2).replace(/\.?0+$/,'')} ${m.unit}</strong><br>
+                💰 NT$ ${(m.amount||0).toLocaleString()}${m.unitCost ? '　NT$ ' + m.unitCost.toFixed(1) + ' / ' + m.unit : ''}
+                ${m.note ? '<br>📝 ' + m.note : ''}
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <span class="tag tag-${m.cat==='皮革'?'order':m.cat==='五金'?'market':'expense'}">${m.cat}</span>
+                <span class="stock-badge ${stockClass}">${m.stock}</span>
+              </div>
+            </div>
+            <div class="material-card-footer">
               <select style="padding:4px 8px;font-size:11px;width:auto;" onchange="updateMatStock(${m.id}, this.value)">
                 <option${m.stock==='充足'?' selected':''}>充足</option>
                 <option${m.stock==='偏低'?' selected':''}>偏低</option>
                 <option${m.stock==='已用完'?' selected':''}>已用完</option>
               </select>
+              <div style="display:flex;gap:4px;">
+                <button class="btn btn-sm btn-outline" onclick="openEditMaterial(${m.id})">編輯</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">刪除</button>
+              </div>
             </div>
-            <div style="display:flex;gap:4px;">
-              <button class="btn btn-sm btn-outline" onclick="openEditMaterial(${m.id})">編輯</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteMaterial(${m.id})">刪除</button>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
-  }
+          </div>`;
+      }).join('');
+    }
 
-  // Stats
-  const total = state.materials.reduce((s,m) => s + m.amount, 0);
-  const byStock = { '充足': 0, '偏低': 0, '已用完': 0 };
-  state.materials.forEach(m => byStock[m.stock]++);
-  const statsEl = document.getElementById('mat-stats');
-  if (statsEl) {
-    statsEl.innerHTML = state.materials.length ? `
+    // Stats (detail mode)
+    const total = state.materials.reduce((s,m) => s+(m.amount||0), 0);
+    const byStock = { '充足':0, '偏低':0, '已用完':0 };
+    state.materials.forEach(m => byStock[m.stock]++);
+    const statsEl = document.getElementById('mat-stats');
+    if (statsEl) statsEl.innerHTML = state.materials.length ? `
       <div class="result-box">
         <div class="result-row"><span class="label">總進貨筆數</span><span class="value">${state.materials.length} 筆</span></div>
         <div class="result-row"><span class="label">總進貨金額</span><span class="value">NT$ ${total.toLocaleString()}</span></div>
-        <div class="result-row"><span class="label">庫存充足</span><span class="value profit-positive">${byStock['充足']} 項</span></div>
-        <div class="result-row"><span class="label">庫存偏低</span><span class="value" style="color:var(--gold-light)">${byStock['偏低']} 項</span></div>
-        <div class="result-row"><span class="label">已用完</span><span class="value profit-negative">${byStock['已用完']} 項</span></div>
+        <div class="result-row"><span class="label">庫存充足</span><span class="value profit-positive">${byStock['充足']} 筆</span></div>
+        <div class="result-row"><span class="label">庫存偏低</span><span class="value" style="color:var(--gold-light)">${byStock['偏低']} 筆</span></div>
+        <div class="result-row"><span class="label">已用完</span><span class="value profit-negative">${byStock['已用完']} 筆</span></div>
       </div>` : '<div class="empty">尚無記錄</div>';
-  }
 
-  // Restock list
-  const restockEl = document.getElementById('mat-restock');
-  if (restockEl) {
-    const needRestock = state.materials.filter(m => m.stock !== '充足');
-    restockEl.innerHTML = needRestock.length
-      ? needRestock.map(m => `
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
-            <span>${m.name} <span style="color:var(--text-muted);">（${m.shop||'—'}）</span></span>
-            <span class="stock-badge ${m.stock==='偏低'?'stock-low':'stock-empty'}">${m.stock}</span>
-          </div>`).join('')
-      : '<div class="empty" style="padding:12px 0;">目前庫存充足 ✓</div>';
+    const restockEl = document.getElementById('mat-restock');
+    if (restockEl) {
+      const need = state.materials.filter(m => m.stock !== '充足');
+      restockEl.innerHTML = need.length
+        ? need.map(m => `
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
+              <span>${m.name} <span style="color:var(--text-muted);">（${m.shop||'—'}）</span></span>
+              <span class="stock-badge ${m.stock==='偏低'?'stock-low':'stock-empty'}">${m.stock}</span>
+            </div>`).join('')
+        : '<div class="empty" style="padding:12px 0;">目前庫存充足 ✓</div>';
+    }
   }
 }
 
@@ -2466,6 +2603,7 @@ window.closeLightbox = closeLightbox;
 window.renderCashflow = renderCashflow;
 window.renderDashboard = renderDashboard;
 window.renderMaterials = renderMaterials;
+window.setMatView = setMatView;
 window.renderProducts = renderProducts;
 window.openModal = openModal;
 window.closeModal = closeModal;
